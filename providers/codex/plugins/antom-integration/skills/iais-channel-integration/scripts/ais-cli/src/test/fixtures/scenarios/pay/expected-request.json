@@ -1,0 +1,13 @@
+{
+  "method": "POST",
+  "pathParameters": {},
+  "headers": {
+    "Content-Type": "application/json; charset=utf-8",
+    "Signature": "synthetic-signature"
+  },
+  "queryParameters": {},
+  "formParameters": {},
+  "contentType": "JSON",
+  "attributes": {},
+  "body": "{\"reference\":\"synthetic-order\"}"
+}

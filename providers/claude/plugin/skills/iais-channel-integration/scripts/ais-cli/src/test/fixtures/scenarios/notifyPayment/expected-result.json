@@ -1,0 +1,12 @@
+{
+  "result": null,
+  "paymentRequestId": "synthetic-notification-order",
+  "paymentId": null,
+  "paymentAmount": null,
+  "urlParam": null,
+  "paymentResultInfo": null,
+  "extendInfo": "synthetic-extension-value",
+  "requestHeaders": null,
+  "rawBody": null,
+  "domain": null
+}

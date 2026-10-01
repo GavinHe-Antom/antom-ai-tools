@@ -1,0 +1,116 @@
+# From Integration Rules to Adapter Code
+
+Use this workflow when the user explicitly asks to implement, complete or fix an adapter. For knowledge questions, read the relevant reference instead.
+
+## 1. Confirm scope; scaffold examples are not institution protocols
+
+Read the target POM, Spring scan configuration, generated SPIs, customization layer and tests. Summarize SDK/template version, card/non-card, one-/two-call 3DS, selected methods, notification types, completed code and existing uncommitted changes. Preserve unrelated work.
+
+For each method, align three inputs: SDK request/response types, user-provided mappings and institution protocol examples. The [rules template](../assets/integration-rules-template.md) can record differences; do not require users to adopt its format. Once confirmed information is complete, implement it without inventing additional approval stages.
+
+If there is no project, use the supplied CLI according to [project generation](project-generation.md). Report missing CLI/SDK artifacts rather than inventing download URLs.
+The locations below apply to CLI 0.1.0. For a platform-supplied generic scaffold, read [scaffold differences](baseline-scaffold.md); do not mix class structures.
+
+## 2. Implement only sufficiently defined rules
+
+| Topic | Required before implementation | If unclear |
+| --- | --- | --- |
+| Capabilities | Exact SPI methods, card type and 3DS mode | Do not enable everything by default |
+| Fields | Source/target paths, types, conditions, defaults, amount units and timezone | Ask about specific fields; do not guess |
+| Security | Algorithm, input order, encoding, prefix, key purpose, platform merchant/institution identity mapping | Do not deliver default no-op security |
+| Transport | Method, Content-Type, headers, Query/Form and dynamic-value sources | Do not configure domains, timeouts or retries yourself |
+| Responses | Success/failure/processing, raw institution codes and platform mapping scope | Unknown must not become success |
+| Notifications | Original-text verification, event types, correlation IDs and ACK | Adapter returns standard notification only; confirm ACK gaps with platform |
+
+Implement independent methods whose rules are complete. With missing security rules, mapping/tests may proceed, but clearly state that the method is not deliverable. Do not fabricate signatures.
+
+## 3. Code locations and wiring
+
+Paths are relative to the adapter's Java root package:
+
+| File/directory | Implementation |
+| --- | --- |
+| spi/ChannelPaymentService, ChannelRefundService, ChannelNotificationService | Generated selected-method wiring; verify against capability inventory |
+| `customize/api/<Method>Mapping` | Per-transaction validate, mapRequestBody, mapUrlParameters and mapResponse |
+| customize/api/Notify*Mapping | Per-notification validate/map; convert verified/decrypted text into standard notifications |
+| customize/transport/ChannelTransportCustomization | Operation-specific HTTP method, protocol headers, Query/Form and Content-Type |
+| customize/security/ChannelSecurityCustomization | Request signing/encryption; response and notification verification/decryption |
+| Response/notification mapping in each Mapping | Confirm success rules and standard result combinations; inject ResultCodeService if needed, without assuming a universal mapper exists |
+| src/test/java, src/test/resources | Real SPI cases, synthetic standard inputs, institution responses and independent expectations |
+| pom.xml, Spring XML | Change coordinates, unique package, scan scope and compatible provided dependencies only when necessary |
+
+Mapping class names capitalize the method and append Mapping: PayMapping, AuthenticateAuthorizeMapping, InquiryRefundMapping and NotifyRefundMapping.
+They implement extension interfaces directly rather than being obtained through pay()/authorize() factory helpers.
+
+Transaction SPIs already invoke template.executeDynamicUrl(operation, original request, Mapping). mapUrlParameters returns raw placeholder values, or an empty Map when no placeholders exist.
+Notification SPIs invoke executeNotification and return PaymentNotifyRequest, CaptureNotifyRequest or RefundNotifyRequest, not NotifyResponse.
+Check fields/event types against the corresponding method page. Selected refund notifications also get a dedicated Mapping; do not create duplicate SPI wiring.
+
+Keep template/extension/model stable for ordinary flows. Make targeted adapter-template changes with tests for non-JSON or non-2xx error-body mapping; do not create another HTTP client to preserve the template unchanged.
+Confirm route support with the platform before combining institution APIs with different destinations.
+
+## 4. Field and transport implementation
+
+1. Validate this operation's business conditions, not another operation's or an example validate hook's requirements.
+2. Construct institution fields explicitly. Platform channelCode/domain/path/requestHeaders do not automatically belong in institution bodies.
+3. Use exact decimal arithmetic with currency and institution units; retain leading zeros in identifiers.
+4. Pass raw dynamic-path, Query and Form values for platform encoding. Do not pre-encode and concatenate again.
+5. Select institution-required headers explicitly; do not copy all inbound headers or supply Host.
+6. Map institution business states. HTTP 200, request acceptance and final transaction success are different.
+7. Verify/decrypt notifications before trusting, validating and mapping the body; return standard notifications for platform forwarding.
+
+CLI JSONObject bodies and early non-2xx exceptions, plus platform GET/HEAD body omission and nonempty Form precedence over Body, affect signing input. Changing a header alone does not establish correct wire content.
+
+## 5. Security implementation decisions
+
+Read the [security APIs](guide/reference/security.md) and select existing methods that exactly match the institution protocol.
+
+### Platform computation
+
+Use separate SecuritySignRequest / SecurityVerifyRequest / SecurityEncryptRequest / SecurityDecryptRequest.
+Supply merchantId, the exact algorithm and plaintext/ciphertext; cipher calls also require cipherType, and verification requires signature. Do not reuse one request type or supply IBCM subject identity/key version.
+
+Obtain merchantId with `ChannelRequestContext.current().getMerchantId()`; generated wrappers populate it. Protocol hooks handle content, signatures, result placement and algorithm parameters only. Do not add a merchant-selection hook or change context. Runtime environment may be null and cannot replace platform sandbox routing.
+
+Use SecurityDigestRequest for unkeyed digests. The adapter adds institution header prefixes and places signatures.
+HMAC_SHA256 outputs HEX; HMAC_SHA256_BASE64 outputs Base64. Similar names are not interchangeable. A false verification result must stop processing.
+
+### Adapter computation
+
+Use queryKey (SecurityKeyRequest) to obtain one SecurityKeyMaterial, specifying merchantId, purpose and keyAlgorithm.
+Confirm text/PEM/Base64 encoding before using host-compatible mature libraries such as Hutool/Tink. If query categories do not meet the protocol, confirm platform support rather than accessing the key system directly.
+Never put keys in static state, logs, exceptions, snapshots or ordinary delivery materials. Transfer actual materials through platform-designated secure channels, not chat.
+
+### Exact signing input
+
+- Implement field order, separators, trailing newline, UTF-8 and null handling explicitly.
+- Digest the actual final body; do not mutate signed content afterward.
+- Use the protocol-required substituted Request-Target path and Query, not a placeholder-containing template.
+- Verify responses/notifications against original text, not parsed and reserialized JSON.
+- Request, response and notification rules can differ; do not force reuse.
+- Use algorithm-native cipher formats. Populate parameters and runtime IV/AAD/PGP in generated typed hooks according to SDK requirements. Do not assume automatic IV packaging or identical encodings; do not switch algorithms merely to compile.
+
+If rules require exact raw bytes, multi-value headers or an unavailable inbound URI, identify the boundary gap and ask the platform rather than claiming lossless preservation.
+
+## 6. Tests must execute the real implementation
+
+Follow the [testing guide](TESTING.md):
+
+- Mock only platform HTTP, security and result-code services; call real SPI entry points, mappings and security customization.
+- Use independent `context.json` for platform identity, bind before invocation and clear in finally. Do not derive merchant identity from input.json business fields.
+- Assert method, headers, body, Query/Form, dynamic values and original context inside the platform HTTP mock Answer; do not call real institutions.
+- Prepare standard input and expected institution payload independently; do not use the mapper under test to generate expectations.
+- Mock sign proves delegation/assembly only; check merchantId/algorithm/content. Independent fixed vectors validate computation rules.
+- When mocking queryKey, execute the real crypto library using public vectors or synthetic keys.
+- Cover security failures with no HTTP, notification verification failures with no business mapping, non-2xx, empty responses, missing fields and unknown codes.
+- Use fixed clocks/IDs or small injectable dependencies for repeatability; do not introduce a generic configuration framework for testing.
+- Do not remove failing cases to hide issues. When reducing capabilities, update scope assertions and explain why.
+
+Run Maven test/package and record exit codes. Distinguish business failures from dependency/environment issues. Report unresolved blockers accurately; skipTests is not passing evidence.
+
+## 7. Completion criteria
+
+Selected methods contain no placeholders, outputs match contracts, security failures stop processing, and tests verify outgoing requests and standard results.
+Update the method capability matrix and outstanding platform configuration. A plain JAR needs platform assembly; tests do not establish deployed beans, routes, keys or result codes.
+
+Change only the authorized project scope. Local packaging does not authorize upload, and delivery checks are not rollout approval.

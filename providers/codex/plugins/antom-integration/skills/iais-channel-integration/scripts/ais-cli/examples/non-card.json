@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "groupId": "com.example.channel",
+  "artifactId": "example-adapter",
+  "version": "1.0.0-SNAPSHOT",
+  "packageName": "com.example.channel.adapter",
+  "channelCode": "example",
+  "sdkVersion": "1.5.2",
+  "paymentType": "non-card",
+  "threeDS": "none",
+  "spi": ["pay"],
+  "security": {
+    "pay": {
+      "request": [
+        {"operation": "sign", "implementation": "platform", "algorithm": "HMAC_SHA256_BASE64", "rule": "confirmed-request-signature"},
+        {"operation": "encrypt", "implementation": "none", "rule": "protocol-no-message-encryption"}
+      ],
+      "response": [
+        {"operation": "verify", "implementation": "platform", "algorithm": "HMAC_SHA256_BASE64", "rule": "confirmed-response-signature"},
+        {"operation": "decrypt", "implementation": "none", "rule": "protocol-no-message-encryption"}
+      ]
+    }
+  }
+}

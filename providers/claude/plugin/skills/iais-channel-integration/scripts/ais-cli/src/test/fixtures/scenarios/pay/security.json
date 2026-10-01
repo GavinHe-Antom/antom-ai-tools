@@ -1,0 +1,14 @@
+{
+  "requestSignRequest": {
+    "merchantId": "synthetic-merchant",
+    "algorithm": "HMAC_SHA256_BASE64",
+    "content": "{\"reference\":\"synthetic-order\"}"
+  },
+  "requestSignResult": "synthetic-signature",
+  "responseVerifyRequest": {
+    "merchantId": "synthetic-merchant",
+    "algorithm": "HMAC_SHA256_BASE64",
+    "content": "{\"state\":\"accepted\"}\n",
+    "signature": "synthetic-response-signature"
+  }
+}

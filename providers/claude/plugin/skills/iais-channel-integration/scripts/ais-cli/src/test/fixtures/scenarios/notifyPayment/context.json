@@ -1,0 +1,5 @@
+{
+  "channelCode": "example",
+  "merchantId": "synthetic-notification-merchant",
+  "runtimeEnv": "synthetic-env"
+}

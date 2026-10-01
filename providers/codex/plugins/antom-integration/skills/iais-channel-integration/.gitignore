@@ -1,0 +1,13 @@
+# Local build output and separately supplied platform artifacts are not distributable.
+target/
+/scripts/ais-cli/sdk/
+*.log
+.env
+.env.*
+!.env.example
+.DS_Store
+.idea/
+.vscode/
+.codefuse/
+__pycache__/
+*.pyc

@@ -8,6 +8,7 @@ A one-stop repository for building AI-powered products with Antom payment integr
 |-------|-------------|
 | **antom-integration** | Integrate Antom payment products including One-time Payments, Tokenized Payment, and Subscription Payment. |
 | **antom-reconciliation-expert** | Reconciliation Report Analysis Expert — Parses local Settlement Detail report files (CSV/XLSX) for settlement amount validation, fee analysis, and reconciliation knowledge Q&A. |
+| **iais-channel-integration** | Build institution-side IAIS channel adapters: understand SPI contracts, implement field mappings and security rules, generate tailored projects, and verify testing and delivery requirements. |
 
 ## Available Plugins
 
@@ -206,6 +207,57 @@ Validate the settlement amounts in my report and show me any discrepancies.
 3. Fee amounts (such as interchangeFee, schemeFee) are displayed as-is from the report. The Skill does not perform reverse rate calculation on these fees.
 4. The Skill is updated in sync with Antom product iterations. It is recommended to periodically re-run the installation command to get the latest version.
 
+## iais-channel-integration
+
+### What Problem Does It Solve
+
+This Skill helps external institution developers implement channel adapters for the IAIS reverse-integration platform. Unlike `antom-integration`, which guides merchants integrating Antom payment products, it focuses on implementing the platform's Java SPI contracts for institution protocols.
+
+It provides task-oriented guidance for SPI selection, request/response field mapping, security processing, platform-managed HTTP and routing, standard result-code mapping, testing, and delivery. The actual SDK supplied by the platform takes precedence over reference snapshots; institution-specific behavior requires confirmed protocol rules.
+
+### Skill and CLI Resources
+
+The shared source is [`skills/iais-channel-integration/`](skills/iais-channel-integration/). Its bundled [`AIS CLI`](skills/iais-channel-integration/scripts/ais-cli/README.md) contains Java source, FreeMarker templates, tests, and an arrow-key selection workflow:
+
+- `ais init` generates a separate adapter project for selected card/non-card capabilities, 3DS flows, notifications, and security rules.
+- `ais package` runs local build, test-evidence, dependency, and ordinary-JAR checks and produces delivery reports. It does not upload artifacts or change platform configuration.
+- The Skill answers integration questions and implements user-confirmed mappings and security rules in a designated adapter project; it does not deploy the platform or modify production configuration.
+
+The source and all required Skill references are included in the existing provider packages. Refresh your installed plugin to discover the added Skill; Gemini CLI and portable clients discover it under the shared `skills/` directory as well. No Antom MCP connection is required for its offline knowledge or local CLI workflows.
+
+### Getting Started
+
+For guidance only, load the Skill and ask a question; neither Java nor the platform SDK is required. For generation, use Java 8 and Maven 3.6.3+ on macOS/Linux. Windows is unverified. From the repository root:
+
+```sh
+mvn -f skills/iais-channel-integration/scripts/ais-cli/pom.xml clean verify
+sh skills/iais-channel-integration/scripts/ais-cli/bin/ais --help
+```
+
+Before `init` or `package`, obtain the platform-authorized SDK 1.5.2 JAR and standalone consumer POM and place them in the CLI's local `sdk/` directory. They are not distributed in this repository. Use the arrow keys and Enter for interactive selection; agents and CI use the documented JSON configuration mode.
+
+```sh
+sh skills/iais-channel-integration/scripts/ais-cli/bin/ais init --output ../my-channel-adapter
+```
+
+Generation produces wiring and customization hooks, not completed institution behavior. Implement the mappings and security rules, prepare independent fixtures, and pass the real SPI tests before packaging. See the [quickstart](skills/iais-channel-integration/QUICKSTART.md), [SPI index](skills/iais-channel-integration/references/guide/reference/spi/README.md), [testing workflow](skills/iais-channel-integration/references/TESTING.md), and [delivery checklist](skills/iais-channel-integration/references/delivery.md).
+
+### Example Prompts
+
+```text
+Use $iais-channel-integration to explain the platform/adapter responsibilities for pay and notifyPayment. Do not change files.
+```
+
+```text
+Use $iais-channel-integration in my adapter directory. Implement pay, inquiryPayment and refund using the confirmed field mappings and security rules below. Add independent tests through the real SPI entry points and list any unresolved protocol details.
+```
+
+### Important Notes
+
+1. The platform owns channel identity, merchant context, domain/path configuration, HTTP transport, key lookup, and iPay forwarding. Adapters implement institution protocol adaptation through the provided platform services.
+2. Do not include real keys, production credentials, card data, or the separately licensed SDK in public issues or commits. Local build output and SDK files are ignored and excluded from provider synchronization.
+3. Passing local tests does not replace platform assembly validation, institution integration testing, or release approval.
+
 ## Repository Layout
 
 ```text
@@ -218,6 +270,8 @@ mcp.json                                 # hosted Antom MCP connection
 .agents/plugins/marketplace.json
 skills/antom-integration/SKILL.md          # shared source of truth
 skills/antom-reconciliation-expert/        # reconciliation expert skill + scripts
+skills/iais-channel-integration/           # IAIS adapter integration skill + references
+  scripts/ais-cli/                        # Java CLI, templates, and regression tests
 providers/
   cursor/plugin/        # Cursor adapter
   claude/plugin/        # Claude Code adapter
@@ -265,3 +319,5 @@ Antom Technical Service — `TechnicalService@antom.com`
 ## License
 
 MIT — see [`LICENSE`](LICENSE).
+
+The `iais-channel-integration` Skill and its AIS CLI retain their [Apache-2.0 license](skills/iais-channel-integration/LICENSE). CLI dependencies retain their own [third-party notices](skills/iais-channel-integration/scripts/ais-cli/THIRD-PARTY-NOTICES.md). This does not grant redistribution rights for the separately supplied platform SDK or institution protocols.
