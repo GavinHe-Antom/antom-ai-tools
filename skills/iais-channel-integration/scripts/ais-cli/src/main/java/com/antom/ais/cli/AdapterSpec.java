@@ -32,14 +32,24 @@ public final class AdapterSpec {
     public String threeDS = "none";
     /** Selected SDK method names; optional methods are omitted rather than returning null. */
     public List<String> spi = new ArrayList<>();
-    /** SPI method -> message direction -> ordered security steps. */
+    /** Simple generation choices; selected features produce demonstration hooks, not a protocol implementation. */
+    public SecurityFeatures securityFeatures;
+    /** Advanced or normalized contract: SPI method -> message direction -> ordered security steps. */
     public Map<String, Map<String, List<SecurityStep>>> security = new LinkedHashMap<>();
+
+    /** Both choices are required when this compact input is supplied; no algorithm or key is inferred. */
+    public static final class SecurityFeatures {
+        /** Generate signing hooks for requests and verification hooks for responses/notifications. */
+        public Boolean signature;
+        /** Generate encryption hooks for requests and decryption hooks for responses/notifications. */
+        public Boolean encryption;
+    }
 
     /** One protocol step, in wire-protocol order; rule is a documentation reference. */
     public static final class SecurityStep {
         /** sign/encrypt for outbound messages, verify/decrypt for incoming messages. */
         public String operation;
-        /** none with an explicit reason, platform calculation, or adapter custom calculation. */
+        /** none, platform calculation, adapter custom calculation, or an unfinished platform demonstration. */
         public String implementation;
         /** Platform signing or encryption enum name, depending on operation. */
         public String algorithm;

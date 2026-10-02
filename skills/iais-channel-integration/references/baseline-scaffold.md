@@ -1,12 +1,12 @@
 # Platform-Supplied Generic Scaffold: Check When Applicable
 
-Read this only when the platform supplied the target project directly and it does not follow the CLI's per-method Mapping structure. This Skill does not include that project. Follow the user's actual files and SDK; names below are not directories that must be created.
+Read this only when the platform supplied the target project directly and it does not follow the CLI's anonymous extensions inside each SPI method. This Skill does not include that project. Follow the user's actual files and SDK; names below are not directories that must be created.
 
 ## Differences from CLI-generated projects
 
 | Check | Possible generic-scaffold structure | Integration action |
 | --- | --- | --- |
-| Mapping | PaymentApiCustomization, RefundApiCustomization, NotificationApiCustomization | Implement rules in existing extensions; do not also recreate the CLI Mapping layer |
+| Mapping | PaymentApiCustomization, RefundApiCustomization, NotificationApiCustomization | Implement rules in those existing extensions; do not transplant the CLI's inline SPI extension structure into this separate scaffold |
 | SPI | Some methods may still return null | Wire selected methods; restore SDK default exceptions for unsupported optional methods |
 | Transaction extensions | pay()/authorize()/cancel()/capture()/inquiryPayment()/refund()/inquiryRefund() | Check actual methods rather than guessing helper names from SPI names |
 | Notification extensions | paymentNotification()/captureNotification(); refund extension may be absent | Implement and wire ChannelNotificationExtension<RefundNotifyRequest> when needed |

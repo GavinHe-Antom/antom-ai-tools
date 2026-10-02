@@ -4,10 +4,10 @@ This guide is for external adapter developers, platform engineers assembling cha
 
 ## Applicability
 
-- SDK: `com.alipay.iacqintegrationhub:common-sdk:1.5.2`; contract review date 2026-09-29, including invocation context, runtimeEnv and payment-notification extendInfo. Identical versions do not guarantee identical artifacts; see [maintenance](12-evidence-and-maintenance.md) for source and checksums.
+- SDK: `com.alipay.iacqintegrationhub:common-sdk:1.5.2`; callback contract review date 2026-10-02. Invocation context, runtimeEnv and payment-notification extendInfo remain available. Identical versions do not guarantee identical artifacts; see [maintenance](12-evidence-and-maintenance.md) for source, review scope and checksums.
 - Implementation instructions default to CLI template 0.1.0. The platform supplies the authorized SDK JAR and standalone consumer POM separately; the public repository has no SDK.
-- The SDK has four SPI interfaces and 14 methods. Confirm platform entry points, channel registration and adapter implementations separately.
-- Vaulting and disputes are excluded. CLI source is available; check whether it is built and supplied with an SDK in the current environment. Some notifications/callbacks have SDK contracts only, without connected entry points.
+- The SDK has three SPI interfaces and 12 methods. Confirm platform entry points, channel registration and adapter implementations separately.
+- Vaulting and disputes are excluded. CLI source is available; check whether it is built and supplied with an SDK in the current environment. Two optional notification methods have SDK contracts only, without connected entry points; the generator excludes them. Browser ACS callbacks are platform-owned, not adapter SPIs.
 - Implementation facts come from code. Integration rules are engineering requirements for delivery. Examples are not real institution protocols.
 - Field tables describe Java types, inheritance, original JavaDoc and defaults, not an approved business JSON Schema. Do not infer undeclared requiredness, lengths or enum conditions.
 
@@ -34,7 +34,7 @@ Platform fields are documented by actual lifecycle stage: guaranteed fields are 
 2. Adapters validate/map fields, implement institution message security and convert business results; all institution HTTP uses platform services.
 3. The platform selects channel identity, egress domain/path and sandbox routes. Adapters do not choose production or sandbox servers.
 4. SDK method declaration, Java override, platform registration and HTTP reachability are four separate conditions.
-5. The CLI wires selected SPIs only. Business Mapping and security hooks still need implementation; passing GeneratedStructureTest does not make transactions operational.
+5. The CLI wires selected SPIs only. Anonymous mapping extensions inside each SPI method and enabled security hooks still need implementation; passing GeneratedStructureTest does not make transactions operational.
 
 ## Organization and evidence
 

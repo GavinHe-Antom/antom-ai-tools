@@ -163,11 +163,6 @@ final class ProjectGenerator {
             }
         }
         for (Capability capability : capabilities) {
-            String mappingTemplate = "mapping.java.ftl";
-            if (capability.isNotification()) {
-                mappingTemplate = "notification.java.ftl";
-            }
-            files.put(javaRoot + "customize/api/" + capability.getTitle() + "Mapping.java", mappingTemplate);
             files.put("src/test/java/" + spec.packageName.replace('.', '/') + "/" + capability.getTitle()
                     + "DeliveryTest.java", "delivery-test.java.ftl");
             files.put("src/test/java/" + spec.packageName.replace('.', '/') + "/" + capability.getTitle()
@@ -199,8 +194,7 @@ final class ProjectGenerator {
 
     private void setFileContext(String path, List<Capability> capabilities, Map<String, Object> model) {
         for (Capability capability : capabilities) {
-            if (path.endsWith("/" + capability.getTitle() + "Mapping.java")
-                    || path.endsWith("/" + capability.getTitle() + "DeliveryTest.java")
+            if (path.endsWith("/" + capability.getTitle() + "DeliveryTest.java")
                     || path.endsWith("/" + capability.getTitle() + "SecurityContractTest.java")) {
                 model.put("capability", capability);
             }

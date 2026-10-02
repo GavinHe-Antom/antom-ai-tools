@@ -52,7 +52,7 @@ Type: `com.alipay.iacqintegrationhub.channel.sdk.spi.refund.response.InquiryRefu
 ## Usage constraints
 
 - Query the original refund without creating another refund or changing its request ID.
-- refundId is optional and paymentRequestId is required. Implement validate and path mapping in InquiryRefundMapping according to institution query criteria.
+- refundId is optional and paymentRequestId is required. Implement validate and path mapping in inquiryRefund's anonymous ChannelApiExtension according to institution query criteria.
 - result represents the query call result; refundStatus represents the refund business status. PROCESSING is not final.
 
 API definition: alipay.ais.payments.inquiryRefund. See [Refund field definitions](../refund-sources.md)
@@ -60,7 +60,7 @@ and [Machine-readable field notes](../refund-field-notes.json).
 
 ## Implementation and verification
 
-The CLI connects the template through `spi/ChannelRefundService`; implement `customize/api/InquiryRefundMapping` methods validate, mapRequestBody, mapUrlParameters, and mapResponse. The dynamic URL API is used by default. Return an empty Map when the path has no placeholders.
+The CLI connects the template through `spi/ChannelRefundService.inquiryRefund`; implement validate, mapRequestBody, mapUrlParameters and mapResponse in that method's anonymous `ChannelApiExtension`. No per-method Mapping helper class is generated. The dynamic URL API is used by default. Return an empty Map when the path has no placeholders.
 
 Implement the generated validate hook using the field rules on this page and the confirmed institution protocol. Do not infer required fields from other methods.
 

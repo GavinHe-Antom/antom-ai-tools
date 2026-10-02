@@ -79,6 +79,15 @@ function interactive(name, card, two, full) {
     const spi = fs.readFileSync(path.join(output, 'src/main/java/com/example/adapter/spi/ChannelPaymentService.java'), 'utf8');
     assert.equal(spi.includes('authenticateAuthorize('), two);
     assert.equal(spi.includes('capture('), card && full);
+    const refundFile = path.join(output, 'src/main/java/com/example/adapter/spi/ChannelRefundService.java');
+    assert.equal(fs.existsSync(refundFile), full);
+    if (full) {
+        const refund = fs.readFileSync(refundFile, 'utf8');
+        assert.match(refund, /RefundResponse refund\(/);
+        assert.match(refund, /InquiryRefundResponse inquiryRefund\(/);
+        assert.match(refund, /new ChannelApiExtension</);
+    }
+    assert(!fs.existsSync(path.join(output, 'src/main/java/com/example/adapter/customize/api')));
     run(`compile-${name}`, maven, ['-B', '-Dtest=GeneratedStructureTest,*SecurityContractTest', 'test'], output);
     return output;
 }
@@ -86,6 +95,44 @@ function interactive(name, card, two, full) {
 interactive('card-two', true, true, true);
 interactive('card-one', true, false, false);
 const nonCard = interactive('non-card', false, false, true);
+
+// Two feature choices create platform examples without selecting institution algorithms.
+for (const [name, signature, encryption] of [
+    ['signature-demo', true, false],
+    ['cipher-demo', false, true],
+    ['combined-demo', true, true],
+    ['no-security-demo', false, false]
+]) {
+    const spec = {schemaVersion: 1, groupId: 'com.example', artifactId: name,
+        packageName: 'com.example.adapter', channelCode: 'example', paymentType: 'non-card',
+        threeDS: 'none', spi: ['pay', 'refund', 'inquiryRefund', 'notifyPayment', 'notifyRefund'],
+        securityFeatures: {signature, encryption}};
+    const config = path.join(root, `${name}.json`);
+    fs.writeFileSync(config, JSON.stringify(spec));
+    const output = path.join(root, name);
+    ais(`generate-${name}`, ['init', '--config', config, '--output', output, '--json']);
+    const normalized = JSON.parse(fs.readFileSync(path.join(output, 'adapter-spec.json'), 'utf8'));
+    for (const directions of Object.values(normalized.security)) {
+        for (const steps of Object.values(directions)) {
+            for (const step of steps) {
+                const enabled = ['sign', 'verify'].includes(step.operation) ? signature : encryption;
+                assert.equal(step.implementation, enabled ? 'demo' : 'none');
+                assert.equal(step.algorithm, null);
+            }
+        }
+    }
+    const source = fs.readFileSync(path.join(output,
+        'src/main/java/com/example/adapter/customize/security/ChannelSecurityCustomization.java'), 'utf8');
+    assert.equal(source.includes('platform.sign('), signature);
+    assert.equal(source.includes('platform.verify('), signature);
+    assert.equal(source.includes('platform.encrypt('), encryption);
+    assert.equal(source.includes('platform.decrypt('), encryption);
+    run(`compile-${name}`, maven, ['-B', '-Dtest=GeneratedStructureTest,*SecurityContractTest', 'test'], output);
+    // Saved configuration must be accepted again after feature expansion, not contain conflicting inputs.
+    ais(`revalidate-${name}`, ['init', '--config', path.join(output, 'adapter-spec.json'),
+        '--output', path.join(root, `${name}-repeat`), '--dry-run', '--json']);
+}
+
 const noTerminalOutput = path.join(root, 'no-terminal');
 const noTerminal = ais('reject-piped-interaction', ['init', '--output', noTerminalOutput, '--json'], '', 2);
 assert.match(JSON.parse(noTerminal.stdout).error, /--config/);
@@ -166,10 +213,11 @@ const generatedDeliveryTest = path.join(deliveryProject, 'src/test/java/com/exam
 const generatedDeliverySource = fs.readFileSync(generatedDeliveryTest, 'utf8');
 assert.match(generatedDeliverySource, /selectedSpiMatchesConfirmedProtocol/);
 // Keep the actual generated delivery test. Only complete its application hooks and independent fixture inputs.
-for (const name of ['PayMapping.java', 'NotifyPaymentMapping.java', 'ChannelSecurityCustomization.java']) {
-    let target = 'src/test/java/com/example/adapter/';
-    if (name === 'PayMapping.java' || name === 'NotifyPaymentMapping.java') target = 'src/main/java/com/example/adapter/customize/api/';
-    if (name === 'ChannelSecurityCustomization.java') target = 'src/main/java/com/example/adapter/customize/security/';
+for (const name of ['ChannelPaymentService.java', 'ChannelNotificationService.java', 'ChannelSecurityCustomization.java']) {
+    let target = 'src/main/java/com/example/adapter/spi/';
+    if (name === 'ChannelSecurityCustomization.java') {
+        target = 'src/main/java/com/example/adapter/customize/security/';
+    }
     fs.copyFileSync(path.join(fixtures, name), path.join(deliveryProject, target, name));
 }
 const scenario = path.join(deliveryProject, 'src/test/resources/scenarios/pay');

@@ -79,7 +79,7 @@
         }
       },
       "notes": [
-        "Refund requests must carry refundRequestId, paymentRequestId, paymentId and refundAmount. Implement corresponding business validation in RefundMapping.",
+        "Refund requests must carry refundRequestId, paymentRequestId, paymentId and refundAmount. Implement corresponding business validation in refund's anonymous ChannelApiExtension.",
         "Confirm responsibility and support for insufficient-balance handling, partial/multiple refunds and original-payment status validation against the institution protocol.",
         "When status is unknown or processing, inquire about the original refund; do not resend with a different refund request ID."
       ],
@@ -150,7 +150,7 @@
       },
       "notes": [
         "Query the original refund without initiating another refund or changing its request ID.",
-        "refundId is optional and paymentRequestId is required. Implement validate and path mapping in InquiryRefundMapping according to institution inquiry requirements.",
+        "refundId is optional and paymentRequestId is required. Implement validate and path mapping in inquiryRefund's anonymous ChannelApiExtension according to institution inquiry requirements.",
         "result describes the inquiry call, while refundStatus describes the refund business status; PROCESSING is not final."
       ],
       "source": {

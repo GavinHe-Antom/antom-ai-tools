@@ -62,7 +62,7 @@ and [Machine-readable field notes](../payment-field-notes.json).
 
 ## Implementation and verification
 
-The CLI connects executeNotification through `spi/ChannelNotificationService`. Implement validate and map in `customize/api/NotifyPaymentMapping`, plus the selected verification/decryption steps in the security customization layer.
+The CLI connects executeNotification through `spi/ChannelNotificationService.notifyPayment`. Implement validate and map in that method's anonymous `ChannelNotificationExtension`, plus enabled verification/decryption hooks in the security customization layer. No per-method Mapping helper class is generated.
 
 Verify the signature before mapping. Confirm that the institution ACK requirements are compatible with the platform endpoint.
 

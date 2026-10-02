@@ -2,16 +2,18 @@
 
 ## Current baseline
 
-- SDK contract/artifact review date: 2026-09-29.
-- Platform source baseline: d68f51c. This update synchronizes three SDK additions; it does not mean every other platform implementation description was re-audited. Existing public SPI, security, HTTP, routing and result-code APIs were compared.
+- Callback contract/artifact review date: 2026-10-02.
+- Platform source baseline for this update: ff3fafe. This update synchronizes callback SPI removal and ACS gateway DTO relocation; it does not mean every other platform implementation description was re-audited. The invocation context, runtimeEnv and payment-notification extendInfo additions reviewed on 2026-09-29 remain available.
 - CLI template 0.1.0 pairs with common-sdk 1.5.2. Java 8 and Maven 3.6.3+ are required; macOS/Linux are supported, Windows is unverified.
 - The public repository contains no SDK. The platform supplies an authorized 1.5.2 JAR and standalone consumer POM separately. Generated projects use a file repository with provided scope and record JAR/POM SHA-256.
-- Machine-readable contracts contain four SPI interfaces, 14 methods and 108 types, including ChannelRequestContext, BaseChannelRequest.runtimeEnv and PaymentNotifyRequest.extendInfo. The 22 security types are unchanged.
+- Machine-readable contracts contain three SPI interfaces, 12 methods and 107 types, including ChannelRequestContext, BaseChannelRequest.runtimeEnv and PaymentNotifyRequest.extendInfo. Two optional notification methods remain SDK-only and are excluded from generation. The 22 security types are unchanged.
 - Field tables and machine contracts are reference snapshots, not runtime bean-validation rules. The actual delivered SDK JAR takes precedence.
 
-Authorized SDK JAR SHA-256 used in verification: `2f3bfab41689bad8b1dda92b811ad9c72eb595d558b3d390c97ae1c318ca486c`; consumer POM: `1e8a31b05b3acee60bc916d344e11d216e659511569a59dcd5a509e5a9e6777d`. These identify the verified artifacts, not a permanent allowlist for future valid builds. The SDK itself remains outside the public repository.
+Authorized SDK JAR SHA-256 used in verification: `03e5c91190e1bdf7213f9c12e26197651ec16610cf33144ba3345d01062a2406`; consumer POM: `1e8a31b05b3acee60bc916d344e11d216e659511569a59dcd5a509e5a9e6777d`. These identify the verified artifacts, not a permanent allowlist for future valid builds. The SDK itself remains outside the public repository.
 
 Earlier artifacts also labeled 1.5.2 may lack the added APIs. The CLI first checks for ChannelRequestContext; generated compilation and structure tests verify the fields. generation-lock.json records JAR/POM hashes, and package checks Maven's actual resolved artifacts. Do not edit the lock to conceal inconsistent cached artifacts.
+
+Earlier 1.5.2 artifacts may also retain the removed callback SPI and its former DTO packages. The current ACS DTOs are platform gateway types, not adapter callback contracts. Do not generate callback implementations from an older local snapshot.
 
 Adding PaymentNotifyRequest fields also changes its Lombok all-arguments constructor signature. Examples use builders or setters. Recompile and validate existing adapters; replacing a same-version JAR alone does not prove binary compatibility. Future platform deliveries should use distinct version numbers to avoid overwriting artifacts at identical coordinates.
 

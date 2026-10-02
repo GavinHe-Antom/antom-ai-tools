@@ -5,6 +5,8 @@
 Confirm SDK/template versions, channel code, card or non-card integration, 3DS interaction mode, transaction/notification scope, institution protocol, field mappings, result-code rules, synthetic examples and the platform configuration owner.
 Institution examples are not standard SDK protocols. Do not copy another channel's fields, success codes, headers or signatures.
 
+For new-project creation, use the [generation-input questionnaire](../project-generation.md#confirm-the-generation-inputs). Ask for a missing institution code and payment scenarios before generation; do not wait until after a demo project has been created. Derive project identifiers from the supplied code and use them without a naming approval round, preserving explicit values. Ask exactly two global security yes/no questions: signature handling and encryption handling. Detailed mappings, algorithms, order, computation mode and fixtures are implementation inputs, not prerequisites for merely creating a skeleton.
+
 The default workflow uses CLI 0.1.0; see [project generation](../project-generation.md). The platform supplies the SDK 1.5.2 JAR and standalone consumer POM separately. Prerequisites: Java 8 and Maven 3.6.3+.
 For a generic scaffold supplied directly by the platform, read [scaffold differences](../baseline-scaffold.md) first; do not assume identical class structures.
 
@@ -19,7 +21,7 @@ For a generic scaffold supplied directly by the platform, read [scaffold differe
 | Notifications | Implement notifyPayment when selecting NotificationService | May add notifyCapture/notifyRefund; refund-notification-only generation is not supported |
 | Online-bank/receive-payment notifications and URL callbacks | SDK declaration does not imply a connected entry point | CLI does not generate capabilities whose entry points are not connected |
 
-Java abstract methods are required only when implementing their interface; not every channel must offer refunds or notifications. CLI 0.1.0 additionally requires pay.
+Java abstract methods are required only when implementing their interface; not every channel must offer refunds or notifications. The interactive CLI wizard starts with pay. JSON generation requires pay when a payment-family method is selected, refund for a refund-family method, and notifyPayment for any notification; it can express refund-only or notification-only scopes. NotifyRefund does not itself require the refund transaction, and notifyCapture does not require the capture transaction.
 Do not override unselected optional methods; preserve the SDK's default UnsupportedOperationException instead of returning null or fabricated success.
 Capability changes must update configuration, implementation, tests and platform registration together. Do not rerun init over an existing project.
 
@@ -27,20 +29,19 @@ Capability changes must update configuration, implementation, tests and platform
 
 | Location | Generated content | Integrator work |
 | --- | --- | --- |
-| spi/Channel*Service | Selected methods delegate to the invocation template and corresponding Mapping | Verify scope; do not recreate helper wiring |
-| `customize/api/<Method>Mapping` | Independent extension per selected method, such as PayMapping and NotifyRefundMapping | Validation, field conversion, path parameters and result mapping |
-| customize/security/ChannelSecurityCustomization | Protocol-selected directions/order; platform computation or key-query branches | Merchant identity, signing input, encoding, runtime parameters and result placement |
+| spi/Channel*Service | Selected methods delegate to the invocation template with an anonymous ChannelApiExtension or ChannelNotificationExtension | Validation, field conversion, path parameters and result mapping inside each SPI method; no customize/api helpers |
+| customize/security/ChannelSecurityCustomization | Enabled signature/encryption features demonstrate typed platform calls; disabled features perform no computation | Complete fail-closed protocol hooks, choose computation mode, and confirm order, signing input, encoding, parameters and result placement |
 | customize/transport/ChannelTransportCustomization | JSON/POST starting point | Set institution method, headers, Query/Form and Content-Type |
 | src/test/java | GeneratedStructureTest; SecurityContractTest and DeliveryTest for each method | Distinguish synthetic template validation from real SPI acceptance; add institution scenarios |
 | `src/test/resources/scenarios/<method>` | input, expected-request, response, response-headers, expected-result and security JSON | Supply synthetic protocol fixtures; do not derive expectations from the implementation under test |
 | adapter-spec.json / generation-lock.json | Selections, SDK/template versions and SDK JAR/POM SHA-256 | Preserve provenance; do not edit lock values to bypass validation |
 
-Transaction SPIs use executeDynamicUrl by default. Mapping returns an empty Map when the path has no placeholders; otherwise it returns raw business values for platform encoding.
+Transaction SPIs use executeDynamicUrl by default. Their anonymous ChannelApiExtension returns an empty Map when the path has no placeholders; otherwise it returns raw business values for platform encoding.
 Notification SPIs use executeNotification and return a standard notification request, not an ACK or a direct iPay call. See the [implementation workflow](../implementation-workflow.md).
 
 ## 4. From local verification to platform integration
 
-1. Complete selected Mapping and security hooks; replace initially empty fixtures.
+1. Complete the selected SPI methods' anonymous mapping extensions and security hooks; replace initially empty fixtures.
 2. Run `mvn -Dtest=GeneratedStructureTest test` to check Spring wiring; this does not prove business completeness.
 3. Run `mvn clean verify` for real SPI tests, including security failures, unknown business results and exceptions.
 4. For a trusted project, run `ais package --project . --json` and inspect reports, dependencies and the plain JAR.

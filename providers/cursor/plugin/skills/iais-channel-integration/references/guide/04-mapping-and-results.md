@@ -2,7 +2,7 @@
 
 ## 1. Where mapping belongs
 
-`spi/*Service` is the SDK entry point. `customize/api/*Mapping` converts between standard and institution fields per method. `ChannelInvocationTemplate` orchestrates validation, security, platform HTTP and response conversion. Do not put institution-specific field rules in controllers, platform routing classes or SDK DTOs.
+`spi/*Service` is the SDK entry point. Each transaction method's anonymous `ChannelApiExtension` converts between standard and institution fields; each notification method has an anonymous `ChannelNotificationExtension`. The CLI does not generate `customize/api` helper classes. `ChannelInvocationTemplate` orchestrates validation, security, platform HTTP and response conversion. Do not put institution-specific field rules in controllers, platform routing classes or SDK DTOs.
 
 Maintain four verifiable artifacts per operation: standard-request-to-institution-request mapping, institution-response-to-standard-response mapping, success/failure/processing result-code rules, and positive/negative test fixtures.
 Maintain a separate institution-notification-to-standard-notification-request mapping; do not infer it from synchronous response fields.
@@ -51,7 +51,7 @@ See [model references](reference/models/README.md) for nested fields. A table en
 `BaseResponse.result` is the platform-standard result. `Result` contains resultStatus, resultCode and resultMessage; S/F/U mean success, failure and unknown.
 Transaction lifecycle information also appears in `InquiryRefundResponse.refundStatus`, `Transaction.transactionResult` and similar fields. HTTP 200 alone must not produce Result.success, and acceptance must not be assumed to be a final transaction state.
 
-CLI Mapping templates do not prescribe institution success codes or generate a universal ChannelResultMapper. Implement response mapping per API:
+CLI anonymous extension hooks do not prescribe institution success codes or generate a universal ChannelResultMapper. Implement response mapping per API:
 
 - Only confirmed institution success criteria may produce the corresponding standard success combination.
 - When platform mapping is needed, inject ResultCodeService, call mapping(channelCode, code, message, apiName), and register a matching mock in tests.
@@ -79,4 +79,4 @@ Do not hide problems by:
 CLI validate hooks provide only null-request protection and unfinished implementation hooks; they do not implement business-required field checks automatically. Implement these checks from each method page and the confirmed institution contract. Do not reuse one operation's query criteria for another.
 Field references distinguish source types from business rules; template examples are not universal protocols.
 
-Evidence: CLI Mapping templates, ChannelInvocationTemplate, SDK Result/Amount and request/response classes.
+Evidence: CLI SPI templates and anonymous extension hooks, ChannelInvocationTemplate, SDK Result/Amount and request/response classes.

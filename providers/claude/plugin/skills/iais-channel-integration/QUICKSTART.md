@@ -34,13 +34,15 @@ Use the consumer POM, not the platform source POM with an internal parent. The l
 
 ## Generate a separate adapter
 
+When asking an Agent to generate a project, supply the [generation inputs](references/project-generation.md#confirm-the-generation-inputs): institution code, card/non-card and applicable 3DS mode, selected transaction/notification scenarios, output directory, and whether signature handling and encryption handling are needed. These are the only two security questions for scaffold creation; algorithms, order and computation mode are implementation-stage decisions. The Skill asks about missing requirements and waits for your answers. Once the institution code is supplied, it directly derives and uses channelCode, Maven coordinates and the Java package without asking you to accept a naming proposal. Explicit identifiers are preserved. A complete specification does not require another questionnaire.
+
 From this Skill directory:
 
 ```sh
 sh scripts/ais-cli/bin/ais init --output /absolute/path/to/my-adapter
 ```
 
-Use Up/Down and Enter for choices, and Ctrl+C to cancel. Select card/non-card, 3DS, SPI and notification scope, and per-method security steps from confirmed institution requirements. Do not invent algorithms or mappings. The output must be nonexistent or empty. Install a project-local Skill only **after** generation, since an installation directory would make the target nonempty.
+Use Up/Down and Enter for choices, and Ctrl+C to cancel. Select card/non-card, 3DS, SPI and notification scope, then answer the two global signature/encryption yes/no questions. Confirm refund and refund inquiry separately from refund notification; only selected transactions are generated. The output must be nonexistent or empty. Install a project-local Skill only **after** generation, since an installation directory would make the target nonempty.
 
 For agents and CI, use JSON instead of simulating numeric terminal input. Preview the synthetic example without writing a project:
 
@@ -54,7 +56,7 @@ For real generation, provide your confirmed configuration file and omit `--dry-r
 
 ## Implement and test
 
-Use the [integration rules template](assets/integration-rules-template.md) to provide field mappings, amount units, signing/encryption rules, results and independent synthetic scenarios. Implement the selected methods in the generated `customize/api`, `customize/security` and `customize/transport` layers. Use the actual SDK types and the provided platform services; do not configure HTTP domains, access IBCM directly, or replace platform identity/context.
+Use the [integration rules template](assets/integration-rules-template.md) to provide field mappings, amount units, signing/encryption rules, results and independent synthetic scenarios. Implement transaction mapping in each SPI method's anonymous `ChannelApiExtension`, notification mapping in its anonymous `ChannelNotificationExtension`, and security/transport in `customize/security` and `customize/transport`. No `customize/api` helper classes are generated. Enabled security features contain platform-call examples with typed hooks that fail until the protocol is implemented; decide platform versus custom computation during implementation. Use the actual SDK types and the provided platform services; do not configure HTTP domains, access IBCM directly, or replace platform identity/context.
 
 In the **adapter root**, run:
 

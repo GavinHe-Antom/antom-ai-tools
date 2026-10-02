@@ -19,21 +19,20 @@ This page covers field usage for payment, inquiry, capture, cancellation, and pa
 | User redirection | Return normalUrl when further user action is required; processing does not necessarily require redirection |
 | Notification URL | Payment and capture use paymentNotifyUrl and captureNotifyUrl, respectively; no Dashboard fallback |
 | Capture identity | captureId is required in synchronous capture responses and optional in notifications |
-| Payment query validation | paymentId is optional; implement validate and path parameters in InquiryPaymentMapping according to institution query criteria |
+| Payment query validation | paymentId is optional; implement validate and path parameters in inquiryPayment's anonymous ChannelApiExtension according to institution query criteria |
 | Notification direction | The SPI input is the institution message and its output is the standard notification; the platform forwards to iPay and handles ACK |
-| ACS | The platform endpoint forwards directly to iPay and returns HTTP 302 without calling ACS SPI |
-| Online banking callback | The SDK contract exists, but there is no connected platform endpoint |
+| ACS | The platform endpoint forwards directly to iPay and returns HTTP 302 without calling an adapter SPI; gateway DTOs belong to sdk.api.gateway |
+| Online banking callback | The callback SPI has been removed from the SDK; there is no connected platform endpoint or generated implementation |
 
 ## API definitions
 
-| SPI | Business field definition |
+| SPI or platform flow | Business field definition |
 | --- | --- |
 | [pay](spi/pay.md) | alipay.ais.payments.pay |
 | [inquiryPayment](spi/inquiryPayment.md) | alipay.ais.payments.inquiryPayment |
 | [capture](spi/capture.md) | alipay.ais.payments.capture |
 | [cancel](spi/cancel.md) | alipay.ais.payments.cancel |
-| [acsUrlCallback](spi/acsUrlCallback.md) | alipay.ais.payments.acsUrlCallback |
-| [onlineBankUrlCallback](spi/onlineBankUrlCallback.md) | alipay.ais.payments.onlinebank.urlCallback |
+| [Platform ACS callback](../07-notifications-and-callbacks.md#6-acs-browser-callback) | alipay.ais.payments.acsUrlCallback |
 | [notifyPayment](spi/notifyPayment.md) | alipay.ais.payments.notifyPayment |
 | [notifyCapture](spi/notifyCapture.md) | alipay.ais.payments.notifyCapture |
 

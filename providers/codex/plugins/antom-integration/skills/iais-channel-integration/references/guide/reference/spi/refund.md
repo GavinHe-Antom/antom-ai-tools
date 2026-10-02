@@ -55,7 +55,7 @@ Type: `com.alipay.iacqintegrationhub.channel.sdk.spi.refund.response.RefundRespo
 ## Usage constraints
 
 - A refund request must include refundRequestId, paymentRequestId, paymentId, and refundAmount. The CLI-generated
-  RefundMapping.validate is an unimplemented hook. Complete its checks against this API and the institution protocol; do not assume the template already checks these fields.
+  validate in refund's anonymous ChannelApiExtension is an unimplemented hook. Complete its checks against this API and the institution protocol; do not assume the template already checks these fields.
 - Confirm responsibility and institution support for insufficient balance, partial/multiple refunds, and original payment status validation.
 - If the result is unknown or processing, query the original refund. Do not issue another refund simply by changing its request ID.
 
@@ -64,7 +64,7 @@ and [Machine-readable field notes](../refund-field-notes.json).
 
 ## Implementation and verification
 
-The CLI connects the template through `spi/ChannelRefundService`; implement `customize/api/RefundMapping` methods validate, mapRequestBody, mapUrlParameters, and mapResponse. The dynamic URL API is used by default. Return an empty Map when the path has no placeholders.
+The CLI connects the template through `spi/ChannelRefundService.refund`; implement validate, mapRequestBody, mapUrlParameters and mapResponse in that method's anonymous `ChannelApiExtension`. No per-method Mapping helper class is generated. The dynamic URL API is used by default. Return an empty Map when the path has no placeholders.
 
 Implement the generated validate hook using the field rules on this page and the confirmed institution protocol. Do not infer required fields from other methods.
 

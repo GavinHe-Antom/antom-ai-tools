@@ -8,17 +8,6 @@
   "sdkVersion": "1.5.2",
   "paymentType": "non-card",
   "threeDS": "none",
-  "spi": ["pay"],
-  "security": {
-    "pay": {
-      "request": [
-        {"operation": "sign", "implementation": "platform", "algorithm": "HMAC_SHA256_BASE64", "rule": "confirmed-request-signature"},
-        {"operation": "encrypt", "implementation": "none", "rule": "protocol-no-message-encryption"}
-      ],
-      "response": [
-        {"operation": "verify", "implementation": "platform", "algorithm": "HMAC_SHA256_BASE64", "rule": "confirmed-response-signature"},
-        {"operation": "decrypt", "implementation": "none", "rule": "protocol-no-message-encryption"}
-      ]
-    }
-  }
+  "spi": ["pay", "refund", "inquiryRefund"],
+  "securityFeatures": {"signature": true, "encryption": false}
 }

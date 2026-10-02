@@ -93,7 +93,9 @@ Use mode 2 for other institution protocols when appropriate. Key-query, signing 
 | unprotectNotificationFromChannel | Verify/decrypt before trusting notification business fields; stop on failure |
 | Typed operation requests and result-placement hooks | Implement the selected platform-computation or queryKey branch; populate cipher parameters, runtime IV/AAD/PGP as applicable |
 
-The CLI generates steps for each configured direction. Required hooks initially throw. An explicit none choice performs no computation and requires protocol evidence; do not use none to bypass missing rules.
+Scaffold creation asks only two global yes/no questions, recorded in `securityFeatures.signature` and `securityFeatures.encryption`. Signature generates request-signing and response/notification-verification examples; encryption generates request-encryption and response/notification-decryption examples. Enabled examples call platform APIs through typed protocol hooks that initially throw. Disabled features perform no computation. The booleans are not an algorithm, operation-order or institution-rule declaration.
+
+Complete actual inputs, algorithms, parameters, result placement and order during implementation, choosing platform or custom adapter computation then. Do not treat demonstration defaults or generated tests as protocol evidence. Advanced per-method `security` JSON remains an alternative for already specified rules; its explicit none choice must not conceal missing implementation requirements.
 
 ## 7. Key and sensitive-data rules
 

@@ -2,7 +2,7 @@
 
 ## 1. Compilation does not mean integration is complete
 
-Generated SPIs are wired, but Mapping and security hooks still need implementation. GeneratedStructureTest checks Spring wiring and selected methods only; it does not prove field mapping, signature verification or platform registration.
+Generated SPIs are wired, but anonymous mapping extensions inside each selected SPI method and enabled security hooks still need implementation. GeneratedStructureTest checks Spring wiring and selected methods only; it does not prove field mapping, signature verification or platform registration.
 Delivery tests must run real business implementations. Do not resolve initial failures by deleting or skipping tests.
 
 ## 2. Recommended test layers

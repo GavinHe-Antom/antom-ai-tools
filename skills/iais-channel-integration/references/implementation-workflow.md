@@ -8,7 +8,7 @@ Read the target POM, Spring scan configuration, generated SPIs, customization la
 
 For each method, align three inputs: SDK request/response types, user-provided mappings and institution protocol examples. The [rules template](../assets/integration-rules-template.md) can record differences; do not require users to adopt its format. Once confirmed information is complete, implement it without inventing additional approval stages.
 
-If there is no project, use the supplied CLI according to [project generation](project-generation.md). Report missing CLI/SDK artifacts rather than inventing download URLs.
+If there is no project, follow the [generation-input questionnaire](project-generation.md#confirm-the-generation-inputs) first. Ask for a missing institution code, scope and the two global signature/encryption yes/no answers, wait for those answers, then derive technical identifiers and use the supplied CLI without asking for naming approval. Algorithms, order and computation modes belong to implementation, not scaffold intake. Do not generate a demo or assume capabilities in the meantime. Report missing CLI/SDK artifacts rather than inventing download URLs.
 The locations below apply to CLI 0.1.0. For a platform-supplied generic scaffold, read [scaffold differences](baseline-scaffold.md); do not mix class structures.
 
 ## 2. Implement only sufficiently defined rules
@@ -31,20 +31,19 @@ Paths are relative to the adapter's Java root package:
 | File/directory | Implementation |
 | --- | --- |
 | spi/ChannelPaymentService, ChannelRefundService, ChannelNotificationService | Generated selected-method wiring; verify against capability inventory |
-| `customize/api/<Method>Mapping` | Per-transaction validate, mapRequestBody, mapUrlParameters and mapResponse |
-| customize/api/Notify*Mapping | Per-notification validate/map; convert verified/decrypted text into standard notifications |
+| Anonymous ChannelApiExtension inside each transaction SPI method | Implement validate, mapRequestBody, mapUrlParameters and mapResponse |
+| Anonymous ChannelNotificationExtension inside each notification SPI method | Implement validate/map; convert verified/decrypted text into standard notifications |
 | customize/transport/ChannelTransportCustomization | Operation-specific HTTP method, protocol headers, Query/Form and Content-Type |
 | customize/security/ChannelSecurityCustomization | Request signing/encryption; response and notification verification/decryption |
-| Response/notification mapping in each Mapping | Confirm success rules and standard result combinations; inject ResultCodeService if needed, without assuming a universal mapper exists |
+| Response/notification mapping in each anonymous extension | Confirm success rules and standard result combinations; inject ResultCodeService into the enclosing service if needed, without assuming a universal mapper exists |
 | src/test/java, src/test/resources | Real SPI cases, synthetic standard inputs, institution responses and independent expectations |
 | pom.xml, Spring XML | Change coordinates, unique package, scan scope and compatible provided dependencies only when necessary |
 
-Mapping class names capitalize the method and append Mapping: PayMapping, AuthenticateAuthorizeMapping, InquiryRefundMapping and NotifyRefundMapping.
-They implement extension interfaces directly rather than being obtained through pay()/authorize() factory helpers.
+No `customize/api` directory or per-method Mapping helper classes are generated. Each selected method constructs its anonymous extension at the template call; do not move these hooks into duplicate helper wiring or confuse them with the platform generic scaffold's factories.
 
-Transaction SPIs already invoke template.executeDynamicUrl(operation, original request, Mapping). mapUrlParameters returns raw placeholder values, or an empty Map when no placeholders exist.
+Transaction SPIs invoke template.executeDynamicUrl(operation, original request, new ChannelApiExtension<...>() { ... }). mapUrlParameters returns raw placeholder values, or an empty Map when no placeholders exist.
 Notification SPIs invoke executeNotification and return PaymentNotifyRequest, CaptureNotifyRequest or RefundNotifyRequest, not NotifyResponse.
-Check fields/event types against the corresponding method page. Selected refund notifications also get a dedicated Mapping; do not create duplicate SPI wiring.
+Check fields/event types against the corresponding method page. A selected refund notification has an anonymous extension in notifyRefund; it does not add a refund transaction service. Compare refund/inquiryRefund selections with the confirmed scope before assuming that an absent service is a generator failure.
 
 Keep template/extension/model stable for ordinary flows. Make targeted adapter-template changes with tests for non-JSON or non-2xx error-body mapping; do not create another HTTP client to preserve the template unchanged.
 Confirm route support with the platform before combining institution APIs with different destinations.
@@ -63,7 +62,7 @@ CLI JSONObject bodies and early non-2xx exceptions, plus platform GET/HEAD body 
 
 ## 5. Security implementation decisions
 
-Read the [security APIs](guide/reference/security.md) and select existing methods that exactly match the institution protocol.
+Read the [security APIs](guide/reference/security.md) and select existing methods that exactly match the institution protocol. The scaffold's two `securityFeatures` booleans only generate enabled platform-call examples. Complete their typed protocol hooks, confirm operation order and select platform versus custom adapter computation here; unfinished enabled hooks fail rather than fabricate security.
 
 ### Platform computation
 

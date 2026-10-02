@@ -74,7 +74,7 @@ The key distinction: a transaction SPI returns a standard response, whereas a no
 The implemented path is:
 `Browser GET /{channelCode}/channel/acsUrlCallback → ChannelController → NotifyFacadeSupport.acsUrlCallback → IpayGatewayService → iPay → Controller 302 Location`.
 
-The platform extracts `inSerialNo / signData / outOrderNo` and redirects to `iopengwSystemInnerRedirectionUrl`. An unparseable URL, missing host, userInfo component or scheme other than HTTP/HTTPS produces a 502 response. This path **does not invoke the AcsUrlCallbackService SPI**. Implementing the scaffold's ChannelCallbackService does not change the existing ACS route.
+The platform extracts `inSerialNo / signData / outOrderNo` and redirects to `iopengwSystemInnerRedirectionUrl`. An unparseable URL, missing host, userInfo component or scheme other than HTTP/HTTPS produces a 502 response. This path is platform-owned and does not invoke an adapter SPI. The SDK callback SPI has been removed; the CLI does not generate a callback service. ACS request/response DTOs now belong to `sdk.api.gateway.request/response`.
 
 ## 4. Where context is consumed
 

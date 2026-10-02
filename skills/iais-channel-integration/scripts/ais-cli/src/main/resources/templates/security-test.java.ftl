@@ -58,7 +58,7 @@ class [=capability.title]SecurityContractTest {
         assertThrows(IllegalStateException.class, ChannelRequestContext::current);
     }
 <#list capability.directions as direction>
-<#assign directionActive=false><#list security[capability.method][direction] as step><#if step.implementation != "none"><#assign directionActive=true></#if></#list>
+<#assign directionActive=false><#assign directionDemo=false><#list security[capability.method][direction] as step><#if step.implementation != "none"><#assign directionActive=true></#if><#if step.implementation == "demo"><#assign directionDemo=true></#if></#list>
 <#if directionActive>
 
     @Test
@@ -85,6 +85,30 @@ class [=capability.title]SecurityContractTest {
         }
         assertThrows(IllegalStateException.class, ChannelRequestContext::current);
     }
+<#if directionDemo>
+
+    @Test
+    void [=direction]DemonstrationFailsUntilInstitutionProtocolIsImplemented() {
+        Fixture fixture = new Fixture();
+        ChannelSecurityCustomization unfinished = new ChannelSecurityCustomization(fixture.platform);
+        ChannelRequestContext.bind("[=channelCode]", MERCHANT, null);
+        try {
+<#if direction == "request">
+            assertThrows(UnsupportedOperationException.class, () -> unfinished.protectRequestToChannel(
+                    new ChannelOutboundRequest(ChannelOperation.[=capability.operation], fixture.input,
+                            JSONObject.parseObject(PLAIN_REQUEST))));
+<#else>
+            assertThrows(UnsupportedOperationException.class, () -> unfinished.unprotect[=direction?cap_first]FromChannel(
+                    new InboundChannelMessage(ChannelOperation.[=capability.operation], fixture.input,
+                            200, Collections.emptyMap(), RAW_RESPONSE)));
+</#if>
+            verifyNoInteractions(fixture.platform, fixture.http);
+        } finally {
+            ChannelRequestContext.clear();
+        }
+        assertThrows(IllegalStateException.class, ChannelRequestContext::current);
+    }
+</#if>
 </#if></#list>
 
     @Test
@@ -113,7 +137,12 @@ class [=capability.title]SecurityContractTest {
         ArgumentCaptor<[=type]> [=id] = ArgumentCaptor.forClass([=type].class);
         calls.verify(fixture.platform).[=step.operation]([=id].capture());
         assertEquals(MERCHANT, [=id].getValue().getMerchantId());
-<#if step.operation == "sign" || step.operation == "verify">
+<#if step.implementation == "demo">
+        assertNull([=id].getValue().getAlgorithm(), "Demonstration wiring must not invent an institution algorithm");
+<#if step.operation == "encrypt" || step.operation == "decrypt">
+        assertNull([=id].getValue().getCipherType(), "Demonstration wiring must not infer a cipher type");
+</#if>
+<#elseif step.operation == "sign" || step.operation == "verify">
         assertEquals(SecuritySignAlgorithm.[=step.algorithm], [=id].getValue().getAlgorithm());
 <#else>
         assertEquals(SecurityCipherAlgorithm.[=step.algorithm], [=id].getValue().getAlgorithm());
@@ -178,7 +207,7 @@ class [=capability.title]SecurityContractTest {
         verify(fixture.mapping, never()).mapResponse(any(), any());
 </#if>
     }
-<#if step.implementation == "platform" && step.operation == "verify">
+<#if (step.implementation == "platform" || step.implementation == "demo") && step.operation == "verify">
 
     @Test
     void [=id]FalseAbortsBeforeMapping() {

@@ -1,10 +1,10 @@
 # AcsUrlCallbackResponse
 
-[Model index](README.md) · [SPI index](../spi/README.md)
+[Model index](README.md) · [Platform ACS flow](../../07-notifications-and-callbacks.md#6-acs-browser-callback)
 
-`com.alipay.iacqintegrationhub.channel.sdk.spi.callback.response.AcsUrlCallbackResponse`
+`com.alipay.iacqintegrationhub.channel.sdk.api.gateway.response.AcsUrlCallbackResponse`
 
-ACS URL callback response object.
+Platform-owned ACS URL callback response object; not an adapter SPI output.
 
 Extends: [BaseResponse](BaseResponse.md).
 
@@ -22,17 +22,16 @@ Java types, inheritance and explicit initializers come from source; the table de
 
 ## Protocol reference
 
-- alipay.ais.payments.acsUrlCallback → [acsUrlCallback output](../spi/acsUrlCallback.md).
-- alipay.ais.payments.onlinebank.urlCallback → [onlineBankUrlCallback output](../spi/onlineBankUrlCallback.md).
+- alipay.ais.payments.acsUrlCallback → [platform ACS flow](../../07-notifications-and-callbacks.md#6-acs-browser-callback).
 
 Fields with the same name have method-specific requirements. See [Payment field definitions](../payment-sources.md) for API references.
 
 ## Usage
 
-- SPI: [AcsUrlCallbackService.acsUrlCallback](../spi/acsUrlCallback.md)
-- SPI: [AcsUrlCallbackService.onlineBankUrlCallback](../spi/onlineBankUrlCallback.md)
+- Platform `IpayGatewayService.invokeAcsCallBackUrl` and `NotifyFacade.acsUrlCallback`; the Controller validates the redirect URL and returns HTTP 302.
 
 ## Source
 
-`app/common/common-sdk/src/main/java/com/alipay/iacqintegrationhub/channel/sdk/spi/callback/response/AcsUrlCallbackResponse.java`  
-SHA-256: `82f55e60e7d10bf7a41c7d0778c5c97a9a18f496945d092772149fb22bd981a5`
+`app/common/common-sdk/src/main/java/com/alipay/iacqintegrationhub/channel/sdk/api/gateway/response/AcsUrlCallbackResponse.java`
+
+SHA-256: `cb2c1814df4fcc969200a24921f944498523b484660b5e6bbda4496fc87ab6c0`

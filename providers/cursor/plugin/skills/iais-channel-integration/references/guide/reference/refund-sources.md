@@ -25,8 +25,8 @@ This is the Antom-side refund state, not direct proof that the buyer wallet was 
 
 ## Implementation and validation
 
-- paymentRequestId is required in a refund request. Implement its business validation in RefundMapping.
-- refundId is optional in queries. Implement validate and path mapping in InquiryRefundMapping according to institution criteria; do not make an optional field universally required.
+- paymentRequestId is required in a refund request. Implement its business validation in refund's anonymous ChannelApiExtension.
+- refundId is optional in queries. Implement validate and path mapping in inquiryRefund's anonymous ChannelApiExtension according to institution criteria; do not make an optional field universally required.
 - notifyRefund receives the original institution message and returns RefundNotifyRequest. Explicitly set notifyType to REFUND_RESULT.
 - Refund notifications express their outcome through result; do not treat query status directly as a result code.
 - The platform handles ACK. NotifyResponse.responseText comes from the actual iPay response and is not guaranteed to be the literal success.

@@ -13,7 +13,7 @@
 
 Notify the refund result.
 
-notifyType is documented as REFUND_RESULT but has no initialized default. Set it explicitly in NotifyRefundMapping. The platform forwards the result to iPay.
+notifyType is documented as REFUND_RESULT but has no initialized default. Set it explicitly in notifyRefund's anonymous ChannelNotificationExtension. The platform forwards the result to iPay. Selecting notifyRefund does not automatically include the refund or inquiryRefund transaction.
 
 ## Request
 
@@ -64,7 +64,7 @@ and [Machine-readable field notes](../refund-field-notes.json).
 
 ## Implementation and verification
 
-The CLI connects executeNotification through `spi/ChannelNotificationService`. Implement validate and map in `customize/api/NotifyRefundMapping`, plus the selected verification/decryption steps in the security customization layer.
+The CLI connects executeNotification through `spi/ChannelNotificationService.notifyRefund`. Implement validate and map in that method's anonymous `ChannelNotificationExtension`, plus enabled verification/decryption hooks in the security customization layer. No per-method Mapping helper class is generated.
 
 Verify the signature before mapping. Confirm that the institution ACK requirements are compatible with the platform endpoint.
 

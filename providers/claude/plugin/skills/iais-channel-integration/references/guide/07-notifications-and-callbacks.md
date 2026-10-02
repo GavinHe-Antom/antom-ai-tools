@@ -41,8 +41,8 @@ Verification Request-Target must be the complete substituted path actually calle
 4. Construct the corresponding standard notification DTO, set result and business fields, and retain headers required by subsequent platform processing.
 5. Return a non-null object for platform forwarding. Do not issue another iPay call in the adapter.
 
-For selected notifyPayment/notifyCapture/notifyRefund, the CLI generates NotifyPaymentMapping, NotifyCaptureMapping and NotifyRefundMapping with SPI wiring. Business and security rules remain to be implemented.
-Optional SDK methods notifyOnlineBankPayment/notifyReceivePayment have no complete platform API path and must not be registered or advertised as operational.
+For selected notifyPayment/notifyCapture/notifyRefund, the CLI generates SPI wiring with an anonymous ChannelNotificationExtension inside each method. There are no notification Mapping helper classes. Business and enabled security rules remain to be implemented. Refund notification does not automatically select the refund or refund-inquiry transaction.
+Optional SDK methods notifyOnlineBankPayment/notifyReceivePayment have no complete platform API path and must not be registered or advertised as operational. The CLI does not generate their implementations or operation constants.
 Vault/Dispute SPIs and their notification entry points are not supported.
 
 ## 4. iPay destination composition
@@ -65,13 +65,13 @@ A required fixed string, empty body, special status code or response signature m
 Tests must cover duplicate/out-of-order notifications, timeout redelivery and forwarding-failure acknowledgment.
 Do not assume the platform persists idempotency records or mistake a template header for idempotency storage.
 
-## 6. ACS browser callback versus SPI
+## 6. ACS browser callback
 
 The platform directly forwards `GET /{channelCode}/channel/acsUrlCallback` to iPay, reads `iopengwSystemInnerRedirectionUrl` and returns 302 Location.
-This entry point **does not invoke AcsUrlCallbackService.acsUrlCallback**. Implementing that SPI alone cannot change the entry point's behavior.
+This entry point is platform-owned and does not invoke an adapter SPI. The SDK no longer declares a callback SPI; `AcsUrlCallbackRequest` and `AcsUrlCallbackResponse` belong to `sdk.api.gateway.request/response`. The CLI does not generate callback implementations or operation constants.
 
 Location must be a valid absolute HTTP/HTTPS URL with a host and without userinfo; missing/invalid values produce 502. This is a browser redirect, not a server-side fetch by the platform.
-`onlineBankUrlCallback` has SDK/template placeholders only, not a connected entry point.
+`onlineBankUrlCallback` has been removed from the SDK and has no connected platform entry point. Do not generate an implementation or reuse the ACS URL for it.
 For encoded parameters such as signData, verify encoding counts with end-to-end examples; logged string representations do not establish identical original values.
 
-Evidence: ChannelController, NotifyFacadeSupport, IopengwClient, IpayGatewayRoutes, IpayChannelIdentity, NotificationService and CLI notification Mapping templates.
+Evidence: ChannelController, NotifyFacadeSupport, IopengwClient, IpayGatewayRoutes, IpayChannelIdentity, NotificationService and CLI anonymous notification-extension templates.

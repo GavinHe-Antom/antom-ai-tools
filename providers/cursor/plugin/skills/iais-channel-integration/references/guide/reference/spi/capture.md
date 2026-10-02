@@ -60,7 +60,7 @@ and [Machine-readable field notes](../payment-field-notes.json).
 
 ## Implementation and verification
 
-The CLI connects the template through `spi/ChannelPaymentService`; implement `customize/api/CaptureMapping` methods validate, mapRequestBody, mapUrlParameters, and mapResponse. The dynamic URL API is used by default. Return an empty Map when the path has no placeholders.
+The CLI connects the template through `spi/ChannelPaymentService.capture`; implement validate, mapRequestBody, mapUrlParameters and mapResponse in that method's anonymous `ChannelApiExtension`. No per-method Mapping helper class is generated. The dynamic URL API is used by default. Return an empty Map when the path has no placeholders.
 
 Implement the generated validate hook using the field rules on this page and the confirmed institution protocol. Do not infer required fields from other methods.
 

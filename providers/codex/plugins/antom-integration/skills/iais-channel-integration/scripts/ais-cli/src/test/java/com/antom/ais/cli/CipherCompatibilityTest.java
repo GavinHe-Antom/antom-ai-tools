@@ -1,15 +1,12 @@
 /* SPDX-License-Identifier: Apache-2.0 */
 package com.antom.ais.cli;
 
-import java.io.ByteArrayOutputStream;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collections;
-import org.jline.terminal.Terminal;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -131,26 +128,6 @@ class CipherCompatibilityTest {
             assertTrue(CipherCompatibility.modes(algorithm).isEmpty());
             assertEquals(Collections.singletonList(Capability.PAY), SpecValidator.validate(spec));
         }
-    }
-
-    /** The real terminal wizard must default to PKCS1Padding after RSA2 is selected. */
-    @Test
-    void shouldSelectCompatibleRsaPaddingInTheWizard() throws Exception {
-        String answers = "\r\r\r\rexample\r\033[B\r\r\r\r\r"
-                + "\r\rprotocol-no-sign\r"
-                + "\033[B\rprotocol-rsa-encrypt\r\033[B\033[B\033[B\r\r\r\r"
-                + "\r\rprotocol-no-verify\r\rprotocol-no-decrypt\r";
-        ByteArrayOutputStream transcript = new ByteArrayOutputStream();
-        try (Terminal terminal = TerminalMenuTest.terminal(answers, transcript)) {
-            AdapterSpec spec = new InteractivePrompts(terminal).read();
-            AdapterSpec.SecurityStep encrypt = spec.security.get("pay").get("request").get(1);
-            assertEquals("RSA2", encrypt.algorithm);
-            assertEquals("ECB", encrypt.parameters.get("mode"));
-            assertEquals("PKCS1Padding", encrypt.parameters.get("padding"));
-            assertEquals(Collections.singletonList(Capability.PAY), SpecValidator.validate(spec));
-        }
-        assertTrue(transcript.toString("UTF-8").contains("Cipher padding: PKCS1Padding"));
-        assertFalse(transcript.toString("UTF-8").contains("PKCS5Padding"));
     }
 
     /** Build a complete contract with one platform cipher step and explicit remaining no-op steps. */

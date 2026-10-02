@@ -1,7 +1,7 @@
 # SPI contract index
 
-There are **4 interfaces and 14 methods**. Seven transaction methods and three notification methods have platform endpoints. The ACS endpoint bypasses SPI; the remaining three methods exist only as SDK
-contracts. An available endpoint does not mean every channel has registered it or completed the generated Mapping and security hooks.
+There are **3 interfaces and 12 methods**. Seven transaction methods and three notification methods have platform endpoints. The remaining two optional notification methods exist only as SDK
+contracts and are excluded from generation. The [browser ACS flow](../../07-notifications-and-callbacks.md#6-acs-browser-callback) is platform-owned, not an adapter SPI. An available endpoint does not mean every channel has registered it or completed the generated anonymous mapping extensions and security hooks.
 
 | Interface | Method / method reference | Java requirement | Platform availability | Route key |
 | --- | --- | --- | --- | --- |
@@ -17,8 +17,6 @@ contracts. An available endpoint does not mean every channel has registered it o
 | NotificationService | [notifyRefund](notifyRefund.md) | Optional; throws by default | Endpoint available; registration required | — |
 | NotificationService | [notifyOnlineBankPayment](notifyOnlineBankPayment.md) | Optional; throws by default | SDK only | — |
 | NotificationService | [notifyReceivePayment](notifyReceivePayment.md) | Optional; throws by default | SDK only | — |
-| AcsUrlCallbackService | [acsUrlCallback](acsUrlCallback.md) | Optional; throws by default | Matching endpoint bypasses SPI | — |
-| AcsUrlCallbackService | [onlineBankUrlCallback](onlineBankUrlCallback.md) | Optional; throws by default | SDK only | — |
 
 Each method reference lists request, response, and inherited fields; see the [Model index](../models/README.md) for nested objects. Do not provide a
 bean for an unsupported capability category. Leave unsupported optional methods with their default unsupported behavior; do not return null as a placeholder for completion. VaultService and ChannelDisputeService are excluded because they are not part of the
@@ -40,7 +38,7 @@ The Adapter must enforce required-field and length constraints; Java types and s
 | Institution notification input | domain, path | Not applicable; no channel destination is populated. |
 | Notification SPI output | requestHeaders, rawBody | Preserved by the Adapter from the notification input. |
 | Notification SPI output | domain | Populated by the platform before forwarding to iPay; may be null when SPI returns. |
-| ACS HTTP callback | requestHeaders | Provided by the platform; present. The endpoint does not call ACS SPI. |
+| ACS HTTP callback | requestHeaders | Provided by the platform; present. The endpoint does not call an adapter SPI. |
 | ACS HTTP callback | rawBody / domain | rawBody is not applicable; the platform fills domain before calling iPay. |
 | SPI without a connected endpoint | Base-class fields | Automatic injection is not guaranteed; do not treat it as an available capability. |
 

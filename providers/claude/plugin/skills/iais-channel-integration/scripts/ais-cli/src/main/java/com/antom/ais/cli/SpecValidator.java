@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -49,12 +50,56 @@ final class SpecValidator {
                 require(selected.contains("notifyPayment"), "NotificationService requires notifyPayment");
             }
         }
+        normalizeSecurityFeatures(spec, capabilities);
         require(spec.security != null && spec.security.keySet().equals(selected),
                 "security must explicitly cover exactly the selected methods");
         for (Capability capability : capabilities) {
             validateSecurity(capability, spec.security.get(capability.getMethod()));
         }
         return capabilities;
+    }
+
+    /** Normalize compact inputs once so persisted specs can be validated again by packaging. */
+    private static void normalizeSecurityFeatures(AdapterSpec spec, List<Capability> capabilities) {
+        if (spec.securityFeatures == null) {
+            return;
+        }
+        require(spec.security == null || spec.security.isEmpty(),
+                "Use securityFeatures or detailed security, not both");
+        require(spec.securityFeatures.signature != null && spec.securityFeatures.encryption != null,
+                "securityFeatures requires both signature and encryption booleans");
+        Map<String, Map<String, List<AdapterSpec.SecurityStep>>> security = new LinkedHashMap<>();
+        for (Capability capability : capabilities) {
+            Map<String, List<AdapterSpec.SecurityStep>> directions = new LinkedHashMap<>();
+            for (String direction : capability.getDirections()) {
+                List<AdapterSpec.SecurityStep> steps = new ArrayList<>();
+                if ("request".equals(direction)) {
+                    steps.add(featureStep("sign", spec.securityFeatures.signature));
+                    steps.add(featureStep("encrypt", spec.securityFeatures.encryption));
+                } else {
+                    // Demonstration order only; developers must confirm the institution's actual wire protocol.
+                    steps.add(featureStep("verify", spec.securityFeatures.signature));
+                    steps.add(featureStep("decrypt", spec.securityFeatures.encryption));
+                }
+                directions.put(direction, steps);
+            }
+            security.put(capability.getMethod(), directions);
+        }
+        spec.security = security;
+        spec.securityFeatures = null;
+    }
+
+    private static AdapterSpec.SecurityStep featureStep(String operation, boolean enabled) {
+        AdapterSpec.SecurityStep step = new AdapterSpec.SecurityStep();
+        step.operation = operation;
+        if (enabled) {
+            step.implementation = "demo";
+            step.rule = "demonstration-only feature selected - institution protocol not implemented";
+        } else {
+            step.implementation = "none";
+            step.rule = "feature not selected during project generation";
+        }
+        return step;
     }
 
     private static void validateSecurity(Capability capability, Map<String, List<AdapterSpec.SecurityStep>> directions) {
@@ -71,13 +116,14 @@ final class SpecValidator {
             for (AdapterSpec.SecurityStep step : steps) {
                 require(step != null && operations.contains(step.operation) && seen.add(step.operation),
                         "Duplicate or invalid security operation in " + capability.getMethod() + "/" + direction);
-                require(Arrays.asList("none", "platform", "adapter").contains(step.implementation), "Invalid security implementation");
+                require(Arrays.asList("none", "platform", "adapter", "demo").contains(step.implementation), "Invalid security implementation");
                 require(step.rule != null && step.rule.matches("[A-Za-z0-9][A-Za-z0-9 ._:/-]{0,255}"),
                         "Each step requires a non-secret rule reference/reason (ASCII, at most 256 characters)");
                 require(step.parameters != null, "parameters cannot be null");
-                if ("none".equals(step.implementation)) {
+                if ("none".equals(step.implementation) || "demo".equals(step.implementation)) {
                     require(step.algorithm == null && step.keyAlgorithm == null
-                            && step.cipherType == null && step.parameters.isEmpty(), "none cannot declare algorithm or parameters");
+                            && step.cipherType == null && step.parameters.isEmpty(),
+                            "none/demo cannot declare algorithm or parameters");
                     continue;
                 }
                 if ("adapter".equals(step.implementation)) {

@@ -6,6 +6,7 @@ import com.alipay.iacqintegrationhub.channel.sdk.api.security.PlatformChannelSec
 import com.alipay.iacqintegrationhub.channel.sdk.context.ChannelRequestContext;
 import com.alipay.iacqintegrationhub.channel.sdk.spi.base.BaseChannelRequest;
 import com.alipay.iacqintegrationhub.channel.sdk.spi.notify.request.PaymentNotifyRequest;
+import [=packageName].template.ChannelInvocationTemplate;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import java.util.Arrays;
@@ -53,6 +54,9 @@ class GeneratedStructureTest {
 <#assign service="PaymentService"><#if family == "refund"><#assign service="RefundService"></#if><#if family == "notify"><#assign service="NotificationService"></#if>
 <#if methods?size gt 0>
             Object [=family] = context.getBean(com.alipay.iacqintegrationhub.channel.sdk.spi.[=family].[=service].class);
+            assertEquals(1, [=family].getClass().getDeclaredConstructors().length);
+            assertEquals(Arrays.asList(ChannelInvocationTemplate.class),
+                    Arrays.asList([=family].getClass().getDeclaredConstructors()[0].getParameterTypes()));
             Set<String> [=family]Methods = new HashSet<>();
             Arrays.stream([=family].getClass().getDeclaredMethods()).forEach(method -> [=family]Methods.add(method.getName()));
             assertEquals(new HashSet<>(Arrays.asList(<#list methods as method>"[=method]"<#sep>, </#list>)), [=family]Methods);

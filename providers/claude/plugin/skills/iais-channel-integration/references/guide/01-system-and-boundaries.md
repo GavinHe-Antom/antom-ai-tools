@@ -22,7 +22,7 @@ Here, Facade means a channel module entry class, not an additional public HTTP f
 
 ## 3. Two directions and two contracts
 
-- **Institution capability SPIs:** the platform calls the adapter. common-sdk defines `PaymentService / RefundService / NotificationService / AcsUrlCallbackService`.
+- **Institution capability SPIs:** the platform calls the adapter. common-sdk defines `PaymentService / RefundService / NotificationService`. Browser ACS callbacks are handled by the platform, not an adapter SPI.
 - **Platform service APIs:** the adapter calls the platform. The most commonly used interfaces are `PlatformChannelHttpService / PlatformChannelSecurityService / ResultCodeService`.
 
 Being defined in the same SDK JAR does not mean every interface is implemented by external developers. The host supplies the latter three interfaces, and adapters consume them through Spring injection.

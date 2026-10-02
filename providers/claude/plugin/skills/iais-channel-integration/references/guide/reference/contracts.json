@@ -19,16 +19,15 @@
     "javaVersion": "8"
   },
   "sourceRevisions": {
-    "platform": "d68f51c",
+    "platform": "ff3fafe",
     "scaffolds": "f847f6b + working-tree"
   },
-  "generatedFrom": "Java source contract snapshot; ChannelRequestContext, BaseChannelRequest.runtimeEnv and PaymentNotifyRequest.extendInfo refreshed from SDK source on 2026-09-29; not a validation schema",
-  "asOf": "2026-09-29",
+  "generatedFrom": "Java source contract snapshot; ChannelRequestContext, BaseChannelRequest.runtimeEnv and PaymentNotifyRequest.extendInfo refreshed from SDK source on 2026-09-29; callback SPI removal and ACS gateway DTO relocation refreshed on 2026-10-02, without re-auditing unrelated platform behavior; not a validation schema",
+  "asOf": "2026-10-02",
   "requirednessPolicy": "No automatic requiredness is inferred for business DTOs. Consult source, runtime validators and confirmed channel contract.",
   "availabilityDefinitions": {
     "active": "HTTP entry exists; channel registration and real adapter implementation still required",
-    "sdk_only": "SDK contract exists; no current connected HTTP entry",
-    "bypassed": "Platform ACS HTTP flow exists but bypasses this SPI"
+    "sdk_only": "SDK contract exists; no current connected HTTP entry"
   },
   "spi": [
     {
@@ -39,7 +38,7 @@
       "httpPath": "/{channelCode}/channel/pay",
       "status": "active",
       "purpose": "Initiate payment / first 3DS call",
-      "extension": "PayMapping",
+      "extension": "anonymous ChannelApiExtension in ChannelPaymentService.pay",
       "templateValidation": "validate",
       "requestType": "PayRequest",
       "responseType": "PayResponse",
@@ -54,7 +53,7 @@
       "httpPath": "/{channelCode}/channel/pay/authorize",
       "status": "active",
       "purpose": "Second authorization in a two-call 3DS flow",
-      "extension": "AuthenticateAuthorizeMapping",
+      "extension": "anonymous ChannelApiExtension in ChannelPaymentService.authenticateAuthorize",
       "templateValidation": "validate",
       "requestType": "AuthenticateAuthorizeRequest",
       "responseType": "AuthenticateAuthorizeResponse",
@@ -69,7 +68,7 @@
       "httpPath": "/{channelCode}/channel/cancel",
       "status": "active",
       "purpose": "Cancel payment",
-      "extension": "CancelMapping",
+      "extension": "anonymous ChannelApiExtension in ChannelPaymentService.cancel",
       "templateValidation": "validate",
       "requestType": "CancelRequest",
       "responseType": "CancelResponse",
@@ -84,7 +83,7 @@
       "httpPath": "/{channelCode}/channel/capture",
       "status": "active",
       "purpose": "Capture an authorized payment",
-      "extension": "CaptureMapping",
+      "extension": "anonymous ChannelApiExtension in ChannelPaymentService.capture",
       "templateValidation": "validate",
       "requestType": "CaptureRequest",
       "responseType": "CaptureResponse",
@@ -99,7 +98,7 @@
       "httpPath": "/{channelCode}/channel/inquiryPayment",
       "status": "active",
       "purpose": "Inquire about payment / authorization",
-      "extension": "InquiryPaymentMapping",
+      "extension": "anonymous ChannelApiExtension in ChannelPaymentService.inquiryPayment",
       "templateValidation": "validate",
       "requestType": "InquiryPaymentRequest",
       "responseType": "InquiryPaymentResponse",
@@ -114,7 +113,7 @@
       "httpPath": "/{channelCode}/channel/refund",
       "status": "active",
       "purpose": "Initiate refund",
-      "extension": "RefundMapping",
+      "extension": "anonymous ChannelApiExtension in ChannelRefundService.refund",
       "templateValidation": "validate",
       "requestType": "RefundRequest",
       "responseType": "RefundResponse",
@@ -129,7 +128,7 @@
       "httpPath": "/{channelCode}/channel/inquiryRefund",
       "status": "active",
       "purpose": "Inquire about refund",
-      "extension": "InquiryRefundMapping",
+      "extension": "anonymous ChannelApiExtension in ChannelRefundService.inquiryRefund",
       "templateValidation": "validate",
       "requestType": "InquiryRefundRequest",
       "responseType": "InquiryRefundResponse",
@@ -144,7 +143,7 @@
       "httpPath": "/{channelCode}/channel/notifyPayment/{merchantId}",
       "status": "active",
       "purpose": "Payment result notification",
-      "extension": "NotifyPaymentMapping",
+      "extension": "anonymous ChannelNotificationExtension in ChannelNotificationService.notifyPayment",
       "templateValidation": "validate",
       "requestType": "BaseChannelRequest",
       "responseType": "PaymentNotifyRequest",
@@ -159,7 +158,7 @@
       "httpPath": "/{channelCode}/channel/notifyCapture/{merchantId}",
       "status": "active",
       "purpose": "Capture result notification",
-      "extension": "NotifyCaptureMapping",
+      "extension": "anonymous ChannelNotificationExtension in ChannelNotificationService.notifyCapture",
       "templateValidation": "validate",
       "requestType": "BaseChannelRequest",
       "responseType": "CaptureNotifyRequest",
@@ -174,7 +173,7 @@
       "httpPath": "/{channelCode}/channel/notifyRefund/{merchantId}",
       "status": "active",
       "purpose": "Refund result notification",
-      "extension": "NotifyRefundMapping",
+      "extension": "anonymous ChannelNotificationExtension in ChannelNotificationService.notifyRefund",
       "templateValidation": "validate",
       "requestType": "BaseChannelRequest",
       "responseType": "RefundNotifyRequest",
@@ -210,36 +209,6 @@
       "responseType": "PaymentNotifyRequest",
       "defaultBehavior": "throws UnsupportedOperationException",
       "documentation": "spi/notifyReceivePayment.md"
-    },
-    {
-      "spi": "AcsUrlCallbackService",
-      "method": "acsUrlCallback",
-      "operation": "ACS_URL_CALLBACK",
-      "routeKey": null,
-      "httpPath": null,
-      "status": "bypassed",
-      "purpose": "ACS callback contract",
-      "extension": null,
-      "templateValidation": null,
-      "requestType": "AcsUrlCallbackRequest",
-      "responseType": "AcsUrlCallbackResponse",
-      "defaultBehavior": "throws UnsupportedOperationException",
-      "documentation": "spi/acsUrlCallback.md"
-    },
-    {
-      "spi": "AcsUrlCallbackService",
-      "method": "onlineBankUrlCallback",
-      "operation": "ONLINE_BANK_URL_CALLBACK",
-      "routeKey": null,
-      "httpPath": null,
-      "status": "sdk_only",
-      "purpose": "Online banking URL callback contract",
-      "extension": null,
-      "templateValidation": null,
-      "requestType": "AcsUrlCallbackRequest",
-      "responseType": "AcsUrlCallbackResponse",
-      "defaultBehavior": "throws UnsupportedOperationException",
-      "documentation": "spi/onlineBankUrlCallback.md"
     }
   ],
   "securityRuntime": {
@@ -560,8 +529,8 @@
       "name": "NotifyRouteOperation",
       "qualifiedName": "com.alipay.iacqintegrationhub.channel.sdk.api.config.NotifyRouteOperation",
       "source": "app/common/common-sdk/src/main/java/com/alipay/iacqintegrationhub/channel/sdk/api/config/NotifyRouteOperation.java",
-      "sha256": "4cc2367f8b2df5749a0239c1d3791643066a881019ac174adb35c11dff3857f5",
-      "description": "Standard notification and URL callback operation types used by the platform to select fixed iPay path templates.\n\n<p>Covers all SPI methods in NotificationService and AcsUrlCallbackService.\nEach constant documents the mapping between route keys and SPI methods; it is not inferred from the message notifyType field.\niPay domains are platform-configured; path templates are maintained in platform code.\nA declared type does not mean that its notification endpoint is exposed or its SPI is registered for a channel.</p>\n",
+      "sha256": "74ecaba4b6c857e317effdfffd0530c07d675453b0653463c043b3538a01ba24",
+      "description": "Standard notification and URL callback operation types used by the platform to select fixed iPay path templates.\n\n<p>Covers NotificationService notification types and the platform-owned ACS browser-return type.\nEach notification constant documents the mapping between route keys and SPI methods; ACS is not implemented by an adapter SPI. Types are not inferred from the message notifyType field.\niPay domains are platform-configured; path templates are maintained in platform code.\nA declared type does not mean that its notification endpoint is exposed or its SPI is registered for a channel.</p>\n",
       "extends": [],
       "imports": [],
       "fields": [],
@@ -935,11 +904,11 @@
       "name": "NotifyFacade",
       "qualifiedName": "com.alipay.iacqintegrationhub.channel.sdk.api.facade.NotifyFacade",
       "source": "app/common/common-sdk/src/main/java/com/alipay/iacqintegrationhub/channel/sdk/api/facade/NotifyFacade.java",
-      "sha256": "2db6836911508b3bb4a8d6ccf9535bed4491c3921218feeeace2c383b5726b1f",
+      "sha256": "a748b7b105c81fe49acd6ce325e342e470e2dbd2aae3f8a6781e981ab7a9f4c4",
       "description": "Notification and browser-return entry points exposed by channel SOFA modules to the platform Web layer.\nThe platform finds implementations by channel uniqueId. An implementation first invokes the adapter to convert the channel protocol, then calls the platform iPay gateway service.\nThis contract exposes only payment, capture and refund notifications plus ACS callbacks, not every notification SPI in the SDK.\n\n@version NotifyFacade.java, v 0.1 2026-08-10 14:08 bohuliang\n",
       "extends": [],
       "imports": [
-        "com.alipay.iacqintegrationhub.channel.sdk.spi.callback.response.AcsUrlCallbackResponse",
+        "com.alipay.iacqintegrationhub.channel.sdk.api.gateway.response.AcsUrlCallbackResponse",
         "com.alipay.iacqintegrationhub.channel.sdk.spi.notify.response.NotifyResponse",
         "java.util.Map"
       ],
@@ -1083,12 +1052,12 @@
       "name": "IpayGatewayService",
       "qualifiedName": "com.alipay.iacqintegrationhub.channel.sdk.api.gateway.IpayGatewayService",
       "source": "app/common/common-sdk/src/main/java/com/alipay/iacqintegrationhub/channel/sdk/api/gateway/IpayGatewayService.java",
-      "sha256": "2f1787b0c06d36d619dc8795a43ccec92e955b4b7aa34bf2f8f60d5314cbbf52",
+      "sha256": "8a0584b98a669230b1aeb752e71d0a163d388f551ad348becc57ef63c8a2dcd8",
       "description": "iPay gateway invocation contract. The channel framework depends only on this contract; the host application provides HTTP implementation.\nChannel modules supply protocol identities. The platform reads domain configuration and replaces code-defined path templates, so adapters do not construct iPay URLs.\n",
       "extends": [],
       "imports": [
-        "com.alipay.iacqintegrationhub.channel.sdk.spi.callback.request.AcsUrlCallbackRequest",
-        "com.alipay.iacqintegrationhub.channel.sdk.spi.callback.response.AcsUrlCallbackResponse",
+        "com.alipay.iacqintegrationhub.channel.sdk.api.gateway.request.AcsUrlCallbackRequest",
+        "com.alipay.iacqintegrationhub.channel.sdk.api.gateway.response.AcsUrlCallbackResponse",
         "com.alipay.iacqintegrationhub.channel.sdk.spi.notify.request.CaptureNotifyRequest",
         "com.alipay.iacqintegrationhub.channel.sdk.spi.notify.request.PaymentNotifyRequest",
         "com.alipay.iacqintegrationhub.channel.sdk.spi.notify.request.RefundNotifyRequest",
@@ -5061,52 +5030,10 @@
       "enumValues": []
     },
     {
-      "name": "AcsUrlCallbackService",
-      "qualifiedName": "com.alipay.iacqintegrationhub.channel.sdk.spi.callback.AcsUrlCallbackService",
-      "source": "app/common/common-sdk/src/main/java/com/alipay/iacqintegrationhub/channel/sdk/spi/callback/AcsUrlCallbackService.java",
-      "sha256": "a69af214b74944a0a60a8e884f59b37af0a1718ea59846f6690e0837242a7afa",
-      "description": "ACS URL callback service interface.\n",
-      "extends": [],
-      "imports": [
-        "com.alipay.iacqintegrationhub.channel.sdk.spi.callback.request.AcsUrlCallbackRequest",
-        "com.alipay.iacqintegrationhub.channel.sdk.spi.callback.response.AcsUrlCallbackResponse"
-      ],
-      "fields": [],
-      "methods": [
-        {
-          "name": "acsUrlCallback",
-          "returnType": "AcsUrlCallbackResponse",
-          "defaultMethod": true,
-          "description": "ACS URL callback method.\n\n@param request ACS URL callback request\n@return ACS URL callback response\n",
-          "parameters": [
-            {
-              "name": "request",
-              "type": "AcsUrlCallbackRequest"
-            }
-          ],
-          "line": 22
-        },
-        {
-          "name": "onlineBankUrlCallback",
-          "returnType": "AcsUrlCallbackResponse",
-          "defaultMethod": true,
-          "description": "Online banking URL callback method.\n\n@param request online banking URL callback request\n@return online banking URL callback response\n",
-          "parameters": [
-            {
-              "name": "request",
-              "type": "AcsUrlCallbackRequest"
-            }
-          ],
-          "line": 32
-        }
-      ],
-      "enumValues": []
-    },
-    {
       "name": "AcsUrlCallbackRequest",
-      "qualifiedName": "com.alipay.iacqintegrationhub.channel.sdk.spi.callback.request.AcsUrlCallbackRequest",
-      "source": "app/common/common-sdk/src/main/java/com/alipay/iacqintegrationhub/channel/sdk/spi/callback/request/AcsUrlCallbackRequest.java",
-      "sha256": "b0257dff6acb6516f11e1f7bd7190f02b763819c62a00eca57a67e02b2e0b591",
+      "qualifiedName": "com.alipay.iacqintegrationhub.channel.sdk.api.gateway.request.AcsUrlCallbackRequest",
+      "source": "app/common/common-sdk/src/main/java/com/alipay/iacqintegrationhub/channel/sdk/api/gateway/request/AcsUrlCallbackRequest.java",
+      "sha256": "fc098b7fcef6a752929bbec788182565b2d0603410ff8b2df7e69c6d5c718711",
       "description": "ACS URL callback request object.\n",
       "extends": [
         "BaseIpayRequest"
@@ -5147,9 +5074,9 @@
     },
     {
       "name": "AcsUrlCallbackResponse",
-      "qualifiedName": "com.alipay.iacqintegrationhub.channel.sdk.spi.callback.response.AcsUrlCallbackResponse",
-      "source": "app/common/common-sdk/src/main/java/com/alipay/iacqintegrationhub/channel/sdk/spi/callback/response/AcsUrlCallbackResponse.java",
-      "sha256": "82f55e60e7d10bf7a41c7d0778c5c97a9a18f496945d092772149fb22bd981a5",
+      "qualifiedName": "com.alipay.iacqintegrationhub.channel.sdk.api.gateway.response.AcsUrlCallbackResponse",
+      "source": "app/common/common-sdk/src/main/java/com/alipay/iacqintegrationhub/channel/sdk/api/gateway/response/AcsUrlCallbackResponse.java",
+      "sha256": "cb2c1814df4fcc969200a24921f944498523b484660b5e6bbda4496fc87ab6c0",
       "description": "ACS URL callback response object.\n",
       "extends": [
         "BaseResponse"
@@ -6921,6 +6848,6 @@
       "description": "PGP envelope options. Public/private keys and the private-key password are queried by the platform.\n\n@author IAIS\n@version SecurityPgpParameters.java, v 0.1 2026-09-24 IAIS"
     }
   ],
-  "adapterTemplateNote": "SPI extension names refer to CLI template 0.1.0 per-method Mapping classes; validate business hooks require implementation. Types remain the SDK source snapshot.",
+  "adapterTemplateNote": "SPI extension metadata refers to CLI template 0.1.0 anonymous ChannelApiExtension or ChannelNotificationExtension inside each selected SPI method; no customize/api helper classes are generated. Business hooks and enabled securityFeatures platform-call examples require protocol implementation. Types remain the SDK source snapshot.",
   "artifactAlignmentNote": "CLI template 0.1.0 requires SDK 1.5.2 Jar and standalone consumer POM supplied separately by the platform. The public repository contains no SDK artifacts. Verify actual APIs and artifact hashes before use."
 }

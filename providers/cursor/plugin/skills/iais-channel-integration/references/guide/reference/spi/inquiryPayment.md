@@ -56,14 +56,14 @@ Type: `com.alipay.iacqintegrationhub.channel.sdk.spi.payment.response.InquiryPay
 
 - transactionType uses TransactionType names PAYMENT, CAPTURE, CANCEL, or REFUND. The Java field is String, so the Adapter
   must validate the query types actually supported.
-- paymentId is an optional business field. Implement validate and path parameters in InquiryPaymentMapping according to institution query criteria; do not add a universal required-field constraint.
+- paymentId is an optional business field. Implement validate and path parameters in inquiryPayment's anonymous ChannelApiExtension according to institution query criteria; do not add a universal required-field constraint.
 
 API definition: alipay.ais.payments.inquiryPayment. See [Payment field definitions](../payment-sources.md)
 and [Machine-readable field notes](../payment-field-notes.json).
 
 ## Implementation and verification
 
-The CLI connects the template through `spi/ChannelPaymentService`; implement `customize/api/InquiryPaymentMapping` methods validate, mapRequestBody, mapUrlParameters, and mapResponse. The dynamic URL API is used by default. Return an empty Map when the path has no placeholders.
+The CLI connects the template through `spi/ChannelPaymentService.inquiryPayment`; implement validate, mapRequestBody, mapUrlParameters and mapResponse in that method's anonymous `ChannelApiExtension`. No per-method Mapping helper class is generated. The dynamic URL API is used by default. Return an empty Map when the path has no placeholders.
 
 Implement the generated validate hook using the field rules on this page and the confirmed institution protocol. Do not infer required fields from other methods.
 

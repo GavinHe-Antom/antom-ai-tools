@@ -4,20 +4,20 @@ Channel: [=channelCode]. SDK: [=sdkVersion] (provided). Generator template: [=te
 
 ## Start development
 
-1. `customize/api/*Mapping.java`: implement required-field validation, request/response mapping and path placeholders from the institution documentation.
+1. `spi/ChannelPaymentService.java`, `ChannelRefundService.java` and `ChannelNotificationService.java`: implement each selected method's anonymous extension inline. Transaction methods contain validation, request/response mapping and path placeholders; notification methods contain plaintext validation/mapping after verification/decryption. No separate `*Mapping.java` classes or `customize/api` directory are generated.
 2. `customize/transport/ChannelTransportCustomization.java`: configure GET/POST, headers, query parameters and similar protocol details. Do not configure domains or connection settings, or create another HTTP client.
-3. `customize/security/ChannelSecurityCustomization.java`: implement the selected canonical text and result placement. The platform mode delegates computation to platform APIs; the adapter mode obtains material through platform queryKey and computes with a mature library. Follow the protocol's operation order and stop on security failure.
+3. `customize/security/ChannelSecurityCustomization.java`: implement the selected canonical text and result placement. The two signature/encryption choices create `demo` platform-service examples without choosing an algorithm or declaring a completed protocol. These hooks throw until implemented. Choose platform computation or custom calculation after reviewing the institution protocol; custom calculation obtains material through platform queryKey and uses a mature library. Follow the protocol's actual operation order and stop on security failure.
 4. `src/test/resources/scenarios`: populate independent protocol fixtures in the format below. Mock platform services in tests; do not call real institutions.
-5. `src/test/java/*DeliveryTest.java`: generated assertions cover all HTTP properties and selected typed security requests, exercising real Spring SPI implementations and customization hooks. Add institution-specific result-code, missing-field, boundary and independent algorithm-vector tests. Do not delete assertions to make an unimplemented protocol pass.
+5. `src/test/java/*DeliveryTest.java`: generated assertions cover all HTTP properties and selected typed security requests, exercising real Spring SPI implementations, their inline mapping hooks and security/transport customization. Add institution-specific result-code, missing-field, boundary and independent algorithm-vector tests. Do not delete assertions to make an unimplemented protocol pass.
 6. `ais package --project .`: resolve dependencies, verify the actual SDK JAR/POM, run all tests and inspect the ordinary JAR. Initial delivery-test failures are expected: unfinished business behavior must not be reported as passing.
 
 You may first run `mvn -Dtest=GeneratedStructureTest test` to check structural wiring; this is not delivery acceptance. Use Java 8 / Maven 3.6.3+.
 
 ## Test layers and independent fixtures
 
-- `GeneratedStructureTest`: Spring wiring and the selected SPI method list.
+- `GeneratedStructureTest`: Spring wiring, the selected SPI method list and the constructor's sole `ChannelInvocationTemplate` dependency.
 - `*SecurityContractTest`: synthetic hooks exercise the generated security-step order, merchant/algorithm/content/key-purpose/runtime-parameter delegation, abort on security exceptions or false platform verification, and use of the processed ciphertext in HTTP. These tests do not implement institution protocols or execute real cryptographic algorithms. Fixed test sentinels are not production IVs, signatures or keys.
-- `*DeliveryTest`: execute real customization hooks through SPI and compare with independent fixtures. Empty fixtures or unfinished hooks must fail. Mocked computation results prove delegation, not institution algorithm compatibility. Custom computation especially requires independent valid/invalid signature vectors.
+- `*DeliveryTest`: execute real inline mapping and security/transport hooks through SPI and compare with independent fixtures. Empty fixtures or unfinished hooks must fail. Mocked computation results prove delegation, not institution algorithm compatibility. Custom computation especially requires independent valid/invalid signature vectors.
 
 Each `src/test/resources/scenarios/<method>/` contains:
 
@@ -86,14 +86,20 @@ confirmed notification protocol supplies it; the field does not carry trusted id
 ## Selected capabilities
 
 <#list capabilities as cap>
-- `[=cap.method]` → `customize/api/[=cap.title]Mapping.java`.
+<#assign service="ChannelPaymentService"><#if cap.family == "refund"><#assign service="ChannelRefundService"></#if><#if cap.family == "notify"><#assign service="ChannelNotificationService"></#if>
+- `[=cap.method]` → `spi/[=service].java`, inside `[=cap.method](...)`.
 </#list>
+
+Only selected methods are emitted. `refund` and `inquiryRefund` require explicit selection;
+selecting `notifyRefund` does not enable either transaction SPI.
 
 The template uses the platform's dynamic URL API. Pass an empty map when a path has no placeholders. All URLs come from the platform; use its SDK route view when signatures require the actual target. The template accepts only 2xx JSON responses by default. Adapt the template layer and tests for non-2xx business responses or non-JSON protocols; never fabricate success.
 
 The platform owns channel-context assembly and capability registration, domain/sandbox routing, key lookup and notification forwarding. The generated manifest does not automatically modify platform configuration.
 
 ## Security steps
+
+`demo` marks an unfinished platform-call example, not a production security policy. Its displayed order is only skeleton wiring; confirm the actual algorithm, content, parameters, encoding and order before implementation. Advanced `platform`/`adapter` configurations represent explicitly supplied rules rather than wizard defaults.
 
 | SPI | Direction | Order | Operation | Implementation | Algorithm / key-query type | Rule reference |
 | --- | --- | --- | --- | --- | --- | --- |

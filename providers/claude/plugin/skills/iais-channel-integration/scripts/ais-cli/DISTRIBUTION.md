@@ -10,7 +10,7 @@ If using a separately provided binary distribution:
 2. Extract the distribution and run `sh bin/ais --help` using its supplied launcher.
 3. Obtain SDK **1.5.2** and its standalone consumer POM from the platform maintainer through the authorized delivery channel. Put them in `sdk/common-sdk-1.5.2.jar` and `sdk/common-sdk-1.5.2.pom`, relative to the CLI installation. They are not part of the public Skill or CLI source; `init` will fail explicitly until they are supplied.
 4. Run `sh bin/ais init`. Use the arrow keys and Enter for choices. For automation, use `init --config specification.json --output ./adapter --json`.
-5. Complete the generated `customize` code and independent test fixtures, then run `sh /installation/bin/ais package --project ./adapter --json`.
+5. Complete the anonymous mapping extensions inside each selected `spi/Channel*Service` method, security/transport hooks in `customize`, and independent test fixtures. Security selection asks only whether signatures and encryption are needed; enabled platform-call examples are unfinished until the institution protocol is implemented. Then run `sh /installation/bin/ais package --project ./adapter --json`.
 
 Packaging executes the project's Maven build. Only use it on trusted local source. SDK integrity, successful tests and a normal JAR do not imply institution protocol certification, dependency compatibility approval or production approval. Additional runtime dependencies are listed for platform review in `target/ais-delivery/dependency-audit.json`.
 

@@ -14,12 +14,8 @@ public enum ChannelOperation {
     REFUND("refund", "POST"),
     INQUIRY_REFUND("inquiryRefund", "POST"),
     PAYMENT_NOTIFICATION("paymentNotify", null),
-    ONLINE_BANK_PAYMENT_NOTIFICATION("onlineBankPaymentNotify", null),
-    RECEIVE_PAYMENT_NOTIFICATION("receivePaymentNotify", null),
     CAPTURE_NOTIFICATION("captureNotify", null),
-    REFUND_NOTIFICATION("refundNotify", null),
-    ACS_URL_CALLBACK("acsUrlCallback", null),
-    ONLINE_BANK_URL_CALLBACK("onlineBankUrlCallback", null);
+    REFUND_NOTIFICATION("refundNotify", null);
 
     /**
      * Stable API name used by ResultCodeService and log summaries.

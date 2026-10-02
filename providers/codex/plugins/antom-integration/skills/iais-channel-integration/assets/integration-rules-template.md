@@ -6,15 +6,22 @@ Supply this to a developer or Agent. Reference specific institution protocol sec
 
 | Item | Details |
 | --- | --- |
+| Company/institution code; optional display name | |
 | Adapter project path and allowed change scope | |
-| Platform/SDK version, unique package and coordinates | |
+| Maven groupId, artifactId, project version and Java package: explicit or derived from the code | |
+| Platform/SDK version | |
 | SDK JAR / consumer POM SHA-256; ChannelRequestContext availability | |
-| Platform-assigned channelCode | |
+| Platform-assigned channelCode, or code-derived identifier pending platform registration | |
 | Card / non-card; one-call / two-call / inapplicable 3DS | |
 | Selected transaction methods | |
+| Refund transaction / refund inquiry included or excluded | |
 | Selected notification methods | |
+| Scaffold signature handling needed: yes / no | |
+| Scaffold encryption handling needed: yes / no | |
 | Protocol name, version and source sections | |
 | Platform configuration and integration owners | |
+
+For a new scaffold, the Agent asks about a missing institution code and scope, plus exactly two global security booleans: signature handling and encryption handling. It waits for missing answers, then derives and uses technical identifiers from the supplied code without another approval round, preserving explicit identifiers. Institution codes and company names describe the integration; do not add them as unsupported fields to `adapter-spec.json`. Record the two answers in `securityFeatures`; do not request algorithms, order, computation mode or rule references merely to create the scaffold. Enabled features generate unfinished platform examples, not a completed protocol. Detailed security rules, mappings and acceptance fixtures can be completed during implementation. Refund notification does not imply the refund transaction or refund inquiry.
 
 ## Per-method field mappings
 
@@ -37,9 +44,9 @@ Method: ; direction: standard request → institution request / institution resp
 | Standard code catalog API / parameter-center api / SPI method relationship | |
 | Notification ACK status, headers, body, deadline and redelivery rules | |
 
-## Security rules for each direction
+## Implementation-stage security rules for each direction
 
-Complete separately for request signing/encryption, response verification/decryption and notification verification/decryption.
+Complete after scaffold creation, separately for request signing/encryption, response verification/decryption and notification verification/decryption. The two scaffold booleans do not settle these rules or the platform/custom computation choice.
 
 | Item | Details |
 | --- | --- |

@@ -6,11 +6,11 @@ This page records source-code facts and outstanding handoff questions, not featu
 | --- | --- | --- |
 | SDK artifact matching | CLI template 0.1.0 requires SDK 1.5.2; SDK is absent from the public repository | Obtain JAR and standalone consumer POM separately from the platform; verify actual APIs and artifacts |
 | Sandbox Tracer | Shadow state follows loadMode; Tracer preparation/marking failures warn and continue | Verify downstream services such as keys that rely on propagation; a sandbox domain alone is not end-to-end isolation |
-| Generated SPI | Selected methods are wired; Mapping/security hooks remain unfinished | Complete institution rules and per-method DeliveryTest; structure success is not business success |
-| Notification Mapping | Separate generated notifyPayment/notifyCapture/notifyRefund mappings | Implement verification, validate and map; do not forward to iPay directly or create ACKs |
-| notifyOnlineBankPayment / notifyReceivePayment | SDK declarations exist, platform APIs are not connected | Do not promise integration readiness; confirm platform work first |
-| AcsUrlCallbackService | SDK declaration exists; current browser ACS entry bypasses it | Implementing the SPI does not change the current ACS flow |
-| onlineBankUrlCallback | No current platform entry point | Not a deliverable capability yet |
+| Generated SPI | Selected methods are wired with anonymous mapping extensions; enabled security hooks remain unfinished | Complete institution rules and per-method DeliveryTest; structure success is not business success |
+| Notification mapping | Anonymous ChannelNotificationExtension inside each selected notifyPayment/notifyCapture/notifyRefund method | Implement verification, validate and map; do not forward to iPay directly or create ACKs |
+| notifyOnlineBankPayment / notifyReceivePayment | Optional SDK declarations exist, platform APIs are not connected | The generator excludes their implementations and operation constants; confirm platform work first |
+| ACS browser callback | Platform-owned flow; callback SPI removed and DTOs relocated to sdk.api.gateway | No adapter callback service or callback operation constants are generated |
+| onlineBankUrlCallback | Removed from the SDK; no current platform entry point | Do not generate an implementation or reuse the ACS URL |
 | Vault / Dispute | No SPIs | Do not generate vaulting/dispute implementations; residual enum values do not expose services |
 | AuthorizeRequest / AuthorizeResponse | Retained SDK types, unused by current authorization SPI | Use AuthenticateAuthorizeRequest/Response |
 | Non-2xx | Platform HTTP retains response; CLI template throws early | Adjust adapter template when institution error-body mapping is required |

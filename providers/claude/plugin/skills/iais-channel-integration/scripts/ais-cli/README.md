@@ -44,7 +44,7 @@ sh scripts/ais-cli/bin/ais init
 
 Choose a new adapter output directory, such as `../my-adapter` next to the source root. Relative paths resolve from the current working directory. The target must not exist or must be empty. Generate the project before installing a project-local Skill; placing `.agents/skills/` there first makes the directory nonempty and causes rejection. Do not rerun `init` on existing adapters.
 
-Coordinates, Java package, channelCode, output directory and protocol rule descriptions use text input. Card/non-card, 3DS calls, SPI scope, security implementation, algorithms, cipher parameters and step order use arrow-key menus: **↑ / ↓ moves the highlight, Enter confirms, Ctrl+C cancels**. Option numbers are neither required nor accepted. Long algorithm lists scroll with the selection.
+Coordinates, Java package, channelCode and output directory use text input. Card/non-card, 3DS calls, SPI scope and exactly two global security yes/no questions use arrow-key menus: **↑ / ↓ moves the highlight, Enter confirms, Ctrl+C cancels**. Security asks only whether signature handling and encryption handling are needed; it does not ask for algorithms, order, computation modes or rule references. Option numbers are neither required nor accepted.
 
 ```text
 Payment type
@@ -53,19 +53,15 @@ Payment type
 Up/Down: select | Enter: confirm | Ctrl+C: cancel (1/2)
 ```
 
-pay is required. Card two-call 3DS adds authenticateAuthorize; non-card flows neither ask about nor generate capture. Notifications are based on notifyPayment because it is abstract in the SDK. Algorithm menus and JSON validation share compatibility rules: RSA2 accepts only ECB and RSA padding; symmetric algorithms reject RSA padding; DES/DESede reject GCM. These checks exclude known invalid combinations, not the need to confirm institution protocols and host algorithm support.
+The interactive wizard starts with pay. Card two-call 3DS adds authenticateAuthorize; non-card flows neither ask about nor generate capture. JSON requires pay only for payment-family methods, so refund-only scope is possible. Refund and inquiryRefund are separate selections from notifyRefund; selecting refund inquiry requires refund, while selecting refund notification requires notifyPayment, not refund. The generation summary must explicitly identify selected and excluded refund transactions. Only families with selected methods get a service class.
 
 Interactive mode requires a real ANSI-capable terminal with stdin and stderr attached. Use `--config` for pipes, CI or IDE consoles without terminal support; there is no numeric-input fallback. Menus write only to stderr, so `--json` stdout remains a single result object. Cancellation returns 130, leaves no partial project and restores terminal settings.
 
 Terminal interaction uses [JLine](https://jline.org/docs/terminal/), pinned to Java-8-compatible 3.26.3. It affects only the CLI, not the adapter or platform runtime.
 
-Security questions follow method → direction → order → implementation. Explicitly select every step:
+Answer the two global questions once: signature handling yes/no, then encryption handling yes/no. The answers populate `securityFeatures.signature` and `securityFeatures.encryption`. Signature enables request signing and response/notification verification; encryption enables request encryption and response/notification decryption. Disabled features use no computation. Enabled features generate typed platform-call examples whose protocol hooks throw until implemented, not a working institution algorithm or canonical input.
 
-- none: confirm that the protocol needs no such operation and provide a rule reference; this does not mean “not considered.”
-- platform: delegate computation to platform APIs; select the signing or cipher algorithm and implement generated canonical-text, runtime-parameter and result-placement hooks.
-- adapter: select keyAlgorithm to generate queryKey calls; purpose follows the operation, and custom computation uses a mature library.
-
-Requests support sign/encrypt; responses and notifications support verify/decrypt. Select their order from the protocol. The CLI neither guesses text/fields/encoding nor accepts keys. Static mode/padding/tagBitLength can be configured; supply IV, AAD and PGP options through typed request hooks rather than fixing production randomness. Unimplemented hooks throw explicitly.
+During implementation, confirm the institution's algorithms, operation order, encoding, runtime parameters and result placement. Choose platform computation or custom adapter computation after platform `queryKey` at that stage. Supply IV, AAD and PGP options through typed request hooks rather than fixing production randomness. The CLI never accepts keys. Advanced per-method `security` JSON is available separately when detailed rules are already known; it is not an additional scaffold questionnaire.
 
 Both computation modes obtain merchantId from `ChannelRequestContext.current().getMerchantId()`, not from protocol hooks. Adapters only read platform context; they must not rebuild identity from business content or call bind/clear in production. runtimeEnv may be null and must not independently select sandbox addresses or bypass security.
 
@@ -85,7 +81,7 @@ sh scripts/ais-cli/bin/ais init \
 
 ### Generate a new project
 
-Copy the example and set coordinates, channel and protocol rules from confirmed institution requirements. Example algorithms are not institution requirements. After previewing and checking the actual configuration, generate from the source root into a nonexistent or empty directory:
+Copy the example and set coordinates, channel, selected capabilities and the two security booleans from confirmed requirements. The example selects pay, refund and refund inquiry; this is illustrative, not a default for every channel. Enabled security hooks still need protocol implementation. After previewing and checking the actual configuration, generate from the source root into a nonexistent or empty directory:
 
 ```sh
 sh scripts/ais-cli/bin/ais init \
@@ -106,24 +102,24 @@ When sdkJar/sdkPom are omitted, JSON mode reads the separately authorized files 
 | sdkJar / sdkPom | Omit both to use the CLI's local sdk/; the SDK is separately authorized. Overrides require both local files, not URLs |
 | paymentType / threeDS | card/non-card; none/one/two |
 | spi | pay, authenticateAuthorize, cancel, capture, inquiryPayment, refund, inquiryRefund, notifyPayment, notifyCapture, notifyRefund |
-| security | Exactly covers selected methods and directions; explicitly declare both operations per direction, including none where applicable |
+| securityFeatures | Concise scaffold form: exactly `signature` and `encryption` booleans, applied globally to selected methods |
+| security | Advanced alternative to securityFeatures; exactly covers selected methods/directions with both operations, including none where applicable |
 | security.*.*[].rule | Non-secret rule identifier/reference; ASCII, without control characters or code fragments |
 | platform | sign/verify use algorithm; encrypt/decrypt also require cipherType, and block algorithms require parameters.mode/padding |
 | adapter | Uses keyAlgorithm; implement other protocol details in customization hooks |
 
-The [algorithm catalogue](src/main/resources/catalogue.json) separates signing, encryption and key lookup; do not interchange them. No algorithm is presumed suitable for every institution.
+Do not combine `securityFeatures` and detailed `security`. The advanced form selects `none`, `platform` or `adapter` and retains its operation order, non-secret rule references and algorithm/static-parameter validation. RSA2 accepts only ECB and RSA padding; symmetric algorithms reject RSA padding; DES/DESede reject GCM. The [algorithm catalogue](src/main/resources/catalogue.json) separates signing, encryption and key lookup; do not interchange them. These implementation details are not requested by the wizard, and no algorithm is presumed suitable for every institution.
 
 ## Where to implement
 
 | Directory | Responsibility |
 | --- | --- |
-| spi | Interface wiring for selected methods only |
-| customize/api | Per-method validation, field mapping and result conversion |
+| spi | Selected-method wiring and anonymous ChannelApiExtension (transactions) / ChannelNotificationExtension (notifications) containing validation, field mapping and result conversion |
 | customize/security | Canonical text, platform calls and custom computation |
 | customize/transport | HTTP method, headers, query and Content-Type |
 | template / extension / model / support | Fixed flow, extension interfaces, messages and integration exceptions |
 
-For ordinary JSON protocols, prefer changes in customize. Non-JSON protocols or non-2xx business responses may require explicit template changes and tests. The default template treats non-2xx as call failure rather than guessing business codes. All HTTP calls use the platform; adapters do not configure domains or connection parameters.
+No `customize/api` directory or per-method Mapping helper classes are generated. For ordinary JSON protocols, edit the anonymous extension in the corresponding SPI method plus security/transport customization. Non-JSON protocols or non-2xx business responses may require explicit template changes and tests. The default template treats non-2xx as call failure rather than guessing business codes. All HTTP calls use the platform; adapters do not configure domains or connection parameters.
 
 The SDK is copied into lib/repository with file repository + provided scope. There is no install-sdk command, system scope or SDK fat JAR. adapter-spec.json records choices; generation-lock.json records versions and JAR/POM SHA-256. Generation does not change platform capability registration or channel routing.
 

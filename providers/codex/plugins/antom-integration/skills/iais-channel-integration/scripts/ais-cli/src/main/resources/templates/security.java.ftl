@@ -24,7 +24,11 @@ import [=packageName].extension.message.InboundChannelMessage;
 import [=packageName].model.ChannelOutboundRequest;
 import org.springframework.stereotype.Component;
 
-/** Protocol-specific canonical text and field placement; platform APIs own key lookup and standard computation. */
+/**
+ * Protocol-specific canonical text and field placement; platform APIs own key lookup and standard computation.
+ * Demo steps are platform-service demonstrations only, not a completed institution implementation.
+ * Confirm algorithms, message content, encoding and step order, then choose platform services or custom calculation.
+ */
 @Component
 public class ChannelSecurityCustomization implements ChannelMessageSecurity {
 <#if activeSecurity>
@@ -36,7 +40,7 @@ public class ChannelSecurityCustomization implements ChannelMessageSecurity {
     }
 </#if>
 <#list ["request", "response", "notification"] as direction>
-    /** Apply the explicitly selected protocol steps in the confirmed order. */
+    /** Apply selected steps; demonstration order is a skeleton, not a confirmed institution protocol. */
     @Override
 <#if direction == "request">
     public void protectRequestToChannel(ChannelOutboundRequest message) {
@@ -58,12 +62,21 @@ public class ChannelSecurityCustomization implements ChannelMessageSecurity {
                 plainBody = apply[=id](message, plainBody, platform.queryKey(key[=id](message, plainBody)));
 </#if>
 <#elseif step.operation == "sign" || step.operation == "encrypt">
+<#if step.implementation == "demo">
+                // DEMONSTRATION ONLY: typed platform [=step.operation] call; complete protocol and result-placement hooks first.
+</#if>
                 apply[=id](message, platform.[=step.operation](request[=id](message)));
 <#elseif step.operation == "verify">
+<#if step.implementation == "demo">
+                // DEMONSTRATION ONLY: typed platform verification; unfinished hooks fail and false never succeeds.
+</#if>
                 if (!platform.verify(request[=id](message, plainBody))) {
                     throw new SecurityException("[=cap.method] [=direction] signature verification failed");
                 }
 <#else>
+<#if step.implementation == "demo">
+                // DEMONSTRATION ONLY: typed platform decryption; no algorithm or ciphertext format is assumed.
+</#if>
                 plainBody = platform.decrypt(request[=id](message, plainBody));
 </#if>
 </#list>
@@ -109,6 +122,7 @@ public class ChannelSecurityCustomization implements ChannelMessageSecurity {
         String merchantId = ChannelRequestContext.current().getMerchantId();
         [=requestType] request = build[=id]([=args]);
         request.setMerchantId(merchantId);
+<#if step.implementation == "platform">
 <#if step.operation == "sign" || step.operation == "verify">
         request.setAlgorithm(SecuritySignAlgorithm.[=step.algorithm]);
 <#else>
@@ -127,18 +141,64 @@ public class ChannelSecurityCustomization implements ChannelMessageSecurity {
 </#if>
 </#if>
 </#if>
+</#if>
         return request;
     }
 
+<#if step.implementation == "demo">
+    /** DEMONSTRATION ONLY. Supply the confirmed algorithm, protocol content and options, or replace with custom calculation. */
+    protected [=requestType] build[=id]([=context]) {
+        // TODO: Complete the institution protocol. The wrapper supplies trusted merchant identity only.
+        // The following commented teaching example is intentionally incomplete, not executable protocol code:
+        // [=requestType] request = new [=requestType]();
+<#if step.operation == "sign">
+        // request.setContent(/* institution-defined canonical text derived from message */);
+        // request.setAlgorithm(/* confirmed SecuritySignAlgorithm value */);
+<#elseif step.operation == "verify">
+        // request.setContent(/* institution-defined canonical text derived from message and plainBody */);
+        // request.setSignature(/* institution signature extracted from message headers/body */);
+        // request.setAlgorithm(/* confirmed SecuritySignAlgorithm value */);
+<#else>
+<#if step.operation == "encrypt">
+        // request.setContent(/* institution-defined plaintext derived from message */);
+<#else>
+        // request.setCiphertext(/* institution ciphertext extracted from message and plainBody */);
+</#if>
+        // request.setAlgorithm(/* confirmed SecurityCipherAlgorithm value */);
+        // request.setCipherType(/* matching SecurityCipherType value */);
+        // SecurityCipherParameters parameters = new SecurityCipherParameters();
+        // parameters.setMode(/* confirmed SecurityCipherMode value when applicable */);
+        // parameters.setPadding(/* confirmed SecurityCipherPadding value when applicable */);
+        // parameters.setTagBitLength(/* confirmed authentication tag length when applicable */);
+        // parameters.setIvBase64(/* fresh protocol-defined IV when applicable; never a fixed nonce */);
+        // parameters.setAad(/* protocol-defined additional authenticated data when applicable */);
+        // request.setParameters(parameters);
+</#if>
+        // return request;
+        throw new UnsupportedOperationException("Complete [=id] demonstration with the confirmed institution protocol");
+    }
+<#else>
     /** Rule: [=step.rule]. Supply exact payload/signature and required runtime IV/AAD/PGP options, not identity. */
     protected [=requestType] build[=id]([=context]) {
         // TODO: Build typed SDK request. The wrapper sets merchantId from context; never reuse a fixed nonce.
         throw new UnsupportedOperationException("Implement [=id] canonical text and runtime parameters");
     }
+</#if>
 <#if direction == "request">
 
     /** Place the result in the channel-defined header/body field and encoding; do not alter signed bytes afterward. */
     protected void apply[=id](ChannelOutboundRequest message, String result) {
+<#if step.implementation == "demo">
+        // DEMONSTRATION ONLY: confirm field names, encoding and envelope before implementing this hook.
+<#if step.operation == "sign">
+        // message.putHeader(/* institution-defined signature header name */, result);
+        // Alternatively place the signature in the institution-defined body field without changing signed bytes.
+<#else>
+        // com.alibaba.fastjson.JSONObject envelope = new com.alibaba.fastjson.JSONObject();
+        // envelope.put(/* institution-defined ciphertext field name */, result);
+        // message.setBody(envelope);
+</#if>
+</#if>
         throw new UnsupportedOperationException("Implement [=id] result placement");
     }
 </#if>

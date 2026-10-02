@@ -1,4 +1,4 @@
 interface:
   display_name: "IAIS Channel Integration Assistant"
   short_description: "Implement, test and deliver IAIS channel adapters"
-  default_prompt: "Use $iais-channel-integration to implement the selected SPIs in my scaffold using the field mappings and security rules I provide, and add unit tests and a delivery checklist."
+  default_prompt: "Use $iais-channel-integration to collect missing requirements, derive project identifiers from my institution code without another naming confirmation, and create the scaffold with tests and delivery guidance."

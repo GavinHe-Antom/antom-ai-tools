@@ -101,6 +101,51 @@ class GeneratorTest {
         assertEquals(1, SpecValidator.validate(spec("pay")).size());
     }
 
+    /** Unconnected notifications and removed callbacks are not configurable generation capabilities. */
+    @Test
+    void rejectsUnconnectedNotificationsAndRemovedCallbacks() {
+        for (String method : Arrays.asList("receivePaymentNotify", "onlineBankPaymentNotify",
+                "notifyReceivePayment", "notifyOnlineBankPayment", "acsUrlCallback", "onlineBankUrlCallback")) {
+            GenerationException failure = assertThrows(GenerationException.class,
+                    () -> SpecValidator.validate(spec("pay", "notifyPayment", method)), method);
+            assertEquals(2, failure.exitCode);
+            assertEquals("Unsupported or unconnected SPI method: " + method, failure.getMessage());
+        }
+    }
+
+    /** Selecting every supported capability must not reintroduce unused notification or callback code. */
+    @Test
+    void generatedSourcesOmitUnconnectedNotificationsAndRemovedCallbacks() throws Exception {
+        String[] methods = Arrays.stream(Capability.values()).map(Capability::getMethod).toArray(String[]::new);
+        AdapterSpec spec = spec(methods);
+        spec.paymentType = "card";
+        spec.threeDS = "two";
+        inertSdk(spec);
+        Path project = temporary.resolve("supported-capabilities");
+        new ProjectGenerator().generate(spec, temporary, project, false);
+
+        List<String> removedNames = Arrays.asList("receivePaymentNotify", "onlineBankPaymentNotify",
+                "notifyReceivePayment", "notifyOnlineBankPayment", "acsUrlCallback", "onlineBankUrlCallback",
+                "RECEIVE_PAYMENT_NOTIFICATION", "ONLINE_BANK_PAYMENT_NOTIFICATION",
+                "ACS_URL_CALLBACK", "ONLINE_BANK_URL_CALLBACK");
+        List<Path> sources;
+        try (java.util.stream.Stream<Path> paths = Files.walk(project.resolve("src"))) {
+            sources = paths.filter(path -> path.toString().endsWith(".java"))
+                    .collect(java.util.stream.Collectors.toList());
+        }
+        for (Path source : sources) {
+            String content = new String(Files.readAllBytes(source), StandardCharsets.UTF_8);
+            for (String name : removedNames) {
+                assertFalse(content.contains(name), source + ": " + name);
+            }
+        }
+        assertFalse(Files.exists(project.resolve("src/main/java/com/example/adapter/spi/ChannelCallbackService.java")));
+        assertFalse(Files.exists(project.resolve("src/test/resources/scenarios/receivePaymentNotify")));
+        assertFalse(Files.exists(project.resolve("src/test/resources/scenarios/onlineBankPaymentNotify")));
+        assertFalse(Files.exists(project.resolve("src/test/resources/scenarios/acsUrlCallback")));
+        assertFalse(Files.exists(project.resolve("src/test/resources/scenarios/onlineBankUrlCallback")));
+    }
+
     @Test
     void rejectsUnsupportedCapabilitiesAndMissingAbstractMethods() {
         for (String method : Arrays.asList("capture", "notifyCapture", "notifyRefund", "inquiryRefund", "inquiryPayment", "notifyDispute")) {
@@ -154,9 +199,7 @@ class GeneratorTest {
 
     @Test
     void nonCardInteractiveInputDoesNotAskAboutCaptureOr3ds() throws Exception {
-        String answers = "\r\r\r\rexample\r\033[B\r\r\r\r\r"
-                + "\r\rprotocol-no-sign\r\rprotocol-no-encrypt\r"
-                + "\r\rprotocol-no-verify\r\rprotocol-no-decrypt\r";
+        String answers = "\r\r\r\rexample\r\033[B\r\r\r\r\r\r\r";
         ByteArrayOutputStream transcript = new ByteArrayOutputStream();
         AdapterSpec spec = readPrompts(answers, transcript);
         assertEquals(Arrays.asList("pay"), spec.spi);
@@ -173,9 +216,7 @@ class GeneratorTest {
     /** Selecting card and two-call 3DS includes the required authorization SPI. */
     @Test
     void selectsCardTwoCallWithArrowKeys() throws Exception {
-        String direction = "\r\rprotocol-none\r\rprotocol-none\r";
-        String answers = "\r\r\r\rexample\r\r\033[B\r\r\r\r\r\r"
-                + direction + direction + direction + direction;
+        String answers = "\r\r\r\rexample\r\r\033[B\r\r\r\r\r\r\r\r";
         AdapterSpec spec = readPrompts(answers, new ByteArrayOutputStream());
         assertEquals("card", spec.paymentType);
         assertEquals("two", spec.threeDS);
@@ -183,25 +224,24 @@ class GeneratorTest {
         SpecValidator.validate(spec);
     }
 
-    /** Arrow navigation selects platform algorithms, encryption parameters and adapter key lookup. */
+    /** Refund and its inquiry remain selectable without entering institution algorithms or parameters. */
     @Test
-    void selectsSecurityAlgorithmsAndParametersFromMenus() throws Exception {
-        String answers = "\r\r\r\rexample\r\033[B\r\r\r\r\r"
-                + "\r\033[B\rprotocol-sign\r" + down(8) + "\r"
-                + "\033[B\rprotocol-encrypt\r\r\r" + down(2) + "\r\r\r"
-                + "\r" + down(2) + "\rprotocol-verify\r" + down(16) + "\r\rprotocol-no-decrypt\r";
+    void selectsRefundAndInquiryWithCompactSecurityChoices() throws Exception {
+        String answers = "\r\r\r\rexample\r\033[B\r\r\r\033[B\r\033[B\r\r\033[B\r\033[B\r";
         ByteArrayOutputStream transcript = new ByteArrayOutputStream();
         AdapterSpec spec = readPrompts(answers, transcript);
+        assertEquals(Arrays.asList("pay", "refund", "inquiryRefund"), spec.spi);
+        assertTrue(spec.securityFeatures.signature);
+        assertTrue(spec.securityFeatures.encryption);
+        assertTrue(spec.security.isEmpty());
+        assertEquals(3, SpecValidator.validate(spec).size());
         List<AdapterSpec.SecurityStep> request = spec.security.get("pay").get("request");
-        assertEquals("HMAC_SHA256_BASE64", request.get(0).algorithm);
-        assertEquals("AES", request.get(1).algorithm);
-        assertEquals("SYMMETRIC", request.get(1).cipherType);
-        assertEquals("GCM", request.get(1).parameters.get("mode"));
-        assertEquals("NoPadding", request.get(1).parameters.get("padding"));
-        assertEquals(128, request.get(1).parameters.get("tagBitLength"));
-        assertEquals("HMAC_SHA256_BASE64", spec.security.get("pay").get("response").get(0).keyAlgorithm);
-        assertTrue(transcript.toString("UTF-8").contains("SDK sign algorithm: HMAC_SHA256_BASE64"));
-        SpecValidator.validate(spec);
+        assertEquals("demo", request.get(0).implementation);
+        assertEquals("demo", request.get(1).implementation);
+        assertNull(request.get(0).algorithm);
+        assertNull(request.get(1).algorithm);
+        assertTrue(transcript.toString("UTF-8").contains("Selected SPI methods: pay, refund, inquiryRefund"));
+        assertFalse(transcript.toString("UTF-8").contains("SDK sign algorithm"));
     }
 
     /** EOF cancels initialization instead of generating a partially answered project. */
@@ -216,15 +256,6 @@ class GeneratorTest {
         try (org.jline.terminal.Terminal terminal = TerminalMenuTest.terminal(answers, transcript)) {
             return new InteractivePrompts(terminal).read();
         }
-    }
-
-    /** Build repeated down-arrow events for selecting a known catalogue entry. */
-    private static String down(int count) {
-        StringBuilder keys = new StringBuilder();
-        for (int index = 0; index < count; index++) {
-            keys.append("\033[B");
-        }
-        return keys.toString();
     }
 
     /** The SDK comes from the CLI home even when configuration and output live elsewhere. */
@@ -302,11 +333,17 @@ class GeneratorTest {
         sign.implementation = "platform";
         sign.algorithm = "HMAC_SHA256_BASE64";
         Path project = temporary.resolve("generated");
-        new ProjectGenerator().generate(spec, temporary, project, false);
+        java.util.Map<String, Object> generated = new ProjectGenerator().generate(spec, temporary, project, false);
+        assertInlineMappings(project, spec, generated);
         String service = text(project, "src/main/java/com/example/adapter/spi/ChannelPaymentService.java");
         assertTrue(service.contains("PayResponse pay("));
         assertFalse(service.contains("capture("));
         assertFalse(service.contains("authenticateAuthorize("));
+        String refund = text(project, "src/main/java/com/example/adapter/spi/ChannelRefundService.java");
+        assertTrue(refund.contains("RefundResponse refund(RefundRequest request)"));
+        assertTrue(refund.contains("InquiryRefundResponse inquiryRefund(InquiryRefundRequest request)"));
+        assertTrue(Files.exists(project.resolve("src/test/resources/scenarios/refund/input.json")));
+        assertTrue(Files.exists(project.resolve("src/test/resources/scenarios/inquiryRefund/input.json")));
         assertTrue(text(project, "src/main/java/com/example/adapter/spi/ChannelNotificationService.java").contains("notifyRefund("));
         String security = text(project, "src/main/java/com/example/adapter/customize/security/ChannelSecurityCustomization.java");
         assertTrue(security.contains("platform.sign(requestPayRequestSign(message))"));
@@ -321,6 +358,82 @@ class GeneratorTest {
         assertTrue(Files.exists(project.resolve("src/test/java/com/example/adapter/NotifyRefundDeliveryTest.java")));
         assertEquals(4, assertThrows(GenerationException.class,
                 () -> new ProjectGenerator().generate(spec, temporary, project, false)).exitCode);
+    }
+
+    /** Every supported selected SPI owns its real typed anonymous extension, without a mapping Bean. */
+    @Test
+    void rendersAllSelectedMappingsInsideSpiMethods() throws Exception {
+        String[] methods = Arrays.stream(Capability.values()).map(Capability::getMethod).toArray(String[]::new);
+        AdapterSpec spec = spec(methods);
+        spec.paymentType = "card";
+        spec.threeDS = "two";
+        inertSdk(spec);
+        Path project = temporary.resolve("all-selected");
+        java.util.Map<String, Object> generated = new ProjectGenerator().generate(spec, temporary, project, false);
+        assertInlineMappings(project, spec, generated);
+        String readme = text(project, "README.md");
+        assertTrue(readme.contains("`refund` → `spi/ChannelRefundService.java`, inside `refund(...)`"));
+        assertTrue(readme.contains("`inquiryRefund` → `spi/ChannelRefundService.java`, inside `inquiryRefund(...)`"));
+        assertFalse(readme.contains("→ `customize/api/"));
+    }
+
+    /** Refund notifications do not implicitly add the separately selected transaction family. */
+    @Test
+    void refundNotificationSelectionDoesNotGenerateRefundTransactions() throws Exception {
+        AdapterSpec spec = spec("pay", "notifyPayment", "notifyRefund");
+        inertSdk(spec);
+        Path project = temporary.resolve("refund-notification-only");
+        java.util.Map<String, Object> generated = new ProjectGenerator().generate(spec, temporary, project, false);
+        assertInlineMappings(project, spec, generated);
+        assertFalse(Files.exists(project.resolve("src/main/java/com/example/adapter/spi/ChannelRefundService.java")));
+        assertFalse(Files.exists(project.resolve("src/test/resources/scenarios/refund")));
+        assertFalse(Files.exists(project.resolve("src/test/resources/scenarios/inquiryRefund")));
+        String notification = text(project, "src/main/java/com/example/adapter/spi/ChannelNotificationService.java");
+        assertTrue(notification.contains("notifyRefund(BaseChannelRequest request)"));
+        assertFalse(notification.contains("notifyCapture("));
+    }
+
+    private void assertInlineMappings(Path project, AdapterSpec spec, java.util.Map<String, Object> generated)
+            throws Exception {
+        assertFalse(Files.exists(project.resolve("src/main/java/com/example/adapter/customize/api")));
+        for (Object path : (List<?>) generated.get("files")) {
+            assertFalse(path.toString().endsWith("Mapping.java"), path.toString());
+            assertFalse(path.toString().contains("/customize/api/"), path.toString());
+        }
+        try (java.util.stream.Stream<Path> paths = Files.walk(project)) {
+            assertFalse(paths.anyMatch(path -> path.getFileName().toString().endsWith("Mapping.java")));
+        }
+        for (String method : spec.spi) {
+            Capability capability = Capability.find(method);
+            String serviceName = ProjectGenerator.serviceName(capability.getFamily());
+            String source = text(project, "src/main/java/com/example/adapter/spi/" + serviceName + ".java");
+            assertTrue(source.contains("public " + serviceName + "(ChannelInvocationTemplate template)"));
+            assertFalse(source.contains("customize.api"));
+            String declaration = "public " + capability.getResponseName() + " " + method
+                    + "(" + capability.getRequestName() + " request)";
+            int start = source.indexOf(declaration);
+            assertTrue(start >= 0, method);
+            int nextMethod = source.indexOf("    /** {@inheritDoc} */", start + declaration.length());
+            String methodSource = source.substring(start);
+            if (nextMethod >= 0) {
+                methodSource = source.substring(start, nextMethod);
+            }
+            if (capability.isNotification()) {
+                assertTrue(methodSource.contains("new ChannelNotificationExtension<" + capability.getResponseName() + ">()"));
+                assertTrue(methodSource.contains("void validate(BaseChannelRequest request, String plainBody)"));
+                assertTrue(methodSource.contains(capability.getResponseName() + " map(BaseChannelRequest request, String plainBody)"));
+            } else {
+                assertTrue(methodSource.contains("new ChannelApiExtension<" + capability.getRequestName()
+                        + ", " + capability.getResponseName() + ">()"));
+                assertTrue(methodSource.contains("void validate(" + capability.getRequestName() + " request)"));
+                assertTrue(methodSource.contains("JSONObject mapRequestBody(" + capability.getRequestName() + " request)"));
+                assertTrue(methodSource.contains("Map<String, String> mapUrlParameters(" + capability.getRequestName() + " request)"));
+                assertTrue(methodSource.contains(capability.getResponseName() + " mapResponse(" + capability.getRequestName()
+                        + " request, ChannelHttpResult response)"));
+            }
+            assertTrue(methodSource.contains("TODO:"), method);
+            assertTrue(methodSource.contains("throw new UnsupportedOperationException(\"Implement " + method), method);
+        }
     }
 
     @Test
@@ -412,6 +525,7 @@ class GeneratorTest {
         assertTrue(notification.contains("notificationVerifyFalseAbortsBeforeMapping"));
         assertTrue(notification.contains("verifyNoInteractions(fixture.http, fixture.mapping)"));
         String structure = text(project, "src/test/java/com/example/adapter/GeneratedStructureTest.java");
+        assertTrue(structure.contains("Arrays.asList(ChannelInvocationTemplate.class)"));
         assertTrue(structure.contains("BaseChannelRequest.builder()"));
         assertTrue(structure.contains("PaymentNotifyRequest.builder()"));
         assertTrue(structure.contains("notification.setExtendInfo("));

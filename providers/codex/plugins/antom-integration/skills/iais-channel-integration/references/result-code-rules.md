@@ -88,7 +88,7 @@ Record both original levels and the actual combined value. Do not pass target S 
 With no matching configuration or a query result indicating failure, the platform returns U / UNKNOWN_EXCEPTION. Actual thrown query exceptions may propagate.
 Matches are filtered by API scope. Avoid overlapping wildcard/specific configurations with conflicting meanings; do not assume specific entries automatically win.
 
-The CLI generates neither a universal ChannelResultMapper nor example success codes. Implement confirmed rules in each Mapping; inject ResultCodeService with test mocks when needed.
+The CLI generates neither a universal ChannelResultMapper nor example success codes. Implement confirmed rules in each SPI method's anonymous ChannelApiExtension or ChannelNotificationExtension; inject ResultCodeService into the enclosing service with test mocks when needed.
 For a query requiring APPROVED, do not call Result.success(), which always returns SUCCESS.
 
 ## Framework error codes are separate from institution business codes

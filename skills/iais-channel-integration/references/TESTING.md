@@ -5,7 +5,7 @@
 This page targets CLI 0.1.0 projects using JUnit 5, Mockito 4 and JSON fixtures. Generated tests start a local Spring `AnnotationConfigApplicationContext`, scan the adapter and inject platform mocks. They do not start SOFABoot or connect to institutions, the parameter center or IBCM.
 Field mapping, transport customization, security customization and response mapping must run real implementations. For other supplied projects, read [scaffold differences](baseline-scaffold.md).
 
-SPI wiring is generated; business Mapping and security hooks are unfinished. Initial delivery-test failures are expected, not disposable template noise. Do not bypass real code with replacement SPIs implemented in tests.
+SPI wiring is generated; business hooks in each SPI method's anonymous ChannelApiExtension or ChannelNotificationExtension and enabled security hooks are unfinished. Initial delivery-test failures are expected, not disposable template noise. Do not bypass real code with replacement SPIs implemented in tests.
 
 | Test class | What it covers |
 | --- | --- |
@@ -16,7 +16,7 @@ SPI wiring is generated; business Mapping and security hooks are unfinished. Ini
 
 Every selected method has DeliveryTest and SecurityContractTest. DeliveryTest asserts complete HTTP properties and selected security requests; still supply independent fixtures and add institution rejection, unknown, missing-field and independent algorithm-vector cases.
 SecurityContractTest's synthetic hooks do not replace real security acceptance or imply institution crypto implementations are built into the template.
-When Mapping gains platform dependencies such as ResultCodeService, register matching mocks in the test Spring context.
+When an anonymous extension uses platform dependencies such as ResultCodeService, inject them into the enclosing SPI service and register matching mocks in the test Spring context.
 
 ## 2. Run tests
 
