@@ -7,7 +7,7 @@ import path from 'node:path';
 import {readBytecode, compareSnapshots} from './check-sdk-contracts.mjs';
 
 function fixture(t) {
-    const root = fs.mkdtempSync(path.join(os.tmpdir(), 'ais-contract-check-'));
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), 'aci-contract-check-'));
     t.after(() => fs.rmSync(root, {recursive: true, force: true}));
     fs.mkdirSync(path.join(root, 'models'));
     fs.writeFileSync(path.join(root, 'models/Example.md'), '| `labels` | `Map<String, List<String>>` | Example |\n');
@@ -51,8 +51,30 @@ test('distinguishes enum constants and default method signatures', () => {
     assert.deepEqual(actual.get('demo.Service').methods, [{name: 'invoke', defaultMethod: true, signature: 'invoke(String):String'}]);
 });
 
+test('checks interface defaults consistently across Java 8 and newer javap output', t => {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), 'aci-default-contract-'));
+    t.after(() => fs.rmSync(root, {recursive: true, force: true}));
+    const contracts = {types: [{name: 'Service', qualifiedName: 'demo.Service', extends: [],
+        fields: [], enumValues: [], methods: [
+            {name: 'invoke', parameters: [{type: 'String'}], returnType: 'String', defaultMethod: true},
+            {name: 'required', parameters: [], returnType: 'void', defaultMethod: false},
+            {name: 'create', parameters: [], returnType: 'String', defaultMethod: false},
+            {name: 'helper', parameters: [], returnType: 'void', defaultMethod: false}
+        ]}], spi: []};
+    for (const modifier of ['', 'default ']) {
+        const actual = readBytecode('public interface demo.Service {\n'
+            + ` public ${modifier}java.lang.String invoke(java.lang.String);\n`
+            + ' public abstract void required();\n public static java.lang.String create();\n private void helper();\n}\n'
+            + 'public class demo.Implementation {\n public java.lang.String invoke(java.lang.String);\n}\n');
+        assert.deepEqual(compareSnapshots(contracts, actual, root).errors, []);
+        assert.equal(actual.get('demo.Implementation').methods[0].defaultMethod, false);
+        actual.get('demo.Service').methods[0].defaultMethod = false;
+        assert(compareSnapshots(contracts, actual, root).errors.includes('Service.invoke: default-method mismatch'));
+    }
+});
+
 function inheritedFixture(t) {
-    const root = fs.mkdtempSync(path.join(os.tmpdir(), 'ais-inherited-contract-'));
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), 'aci-inherited-contract-'));
     t.after(() => fs.rmSync(root, {recursive: true, force: true}));
     fs.mkdirSync(path.join(root, 'models'));
     fs.writeFileSync(path.join(root, 'models/Request.md'), '| `amount` | `String` | Amount |\n| `channelCode` | `String` | Context |\n');

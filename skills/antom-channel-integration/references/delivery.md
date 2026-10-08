@@ -1,4 +1,4 @@
-# Delivery Files and Templates
+# AIS Channel Adapter Delivery Files and Templates
 
 This section recommends consistent file names and content for offline collaboration. It is not a format already validated automatically by the CLI. Markdown, CSV or Excel may be used by agreement with the platform, but required information must not be omitted. Explain why an item is not applicable instead of leaving an ambiguous blank.
 
@@ -206,11 +206,12 @@ The test/integration report must include:
 | Sandbox/routing | Correct egress and material selection, without mixing normal traffic |
 | Open issues | Impact, owner, delivery-blocking status and follow-up confirmation |
 
-For CLI projects, include `target/ais-delivery/report.json`: `executedTests` and `scenarioEvidence` identify actual testcase names, case IDs/categories and fixture hashes. Every selected method must retain at least one confirmed returning success/processing/protocol case; all expected-error cases are insufficient. Review protocol applicability instead of treating counts as certification. `platformConformance` is `not-executed-by-ais-package`; supply separate host/institution evidence when completed.
+For CLI projects, include `target/aci-delivery/report.json`: `executedTests` and `scenarioEvidence` identify actual testcase names, case IDs/categories and fixture hashes. Every selected method must retain at least one confirmed returning success/processing/protocol case; all expected-error cases are insufficient. Review protocol applicability instead of treating counts as certification. `platformConformance` is `not-executed-by-aci-package`; supply separate host/institution evidence when completed.
 
 Artifact notes must include:
 
 - JAR filename, Maven coordinates, adapter/SDK versions and source revision.
+- Manifest `IAIS-SDK-Version` matches the documented AIS SDK version.
 - SHA-256, build command, Java version and dependency tree.
 - Additional dependency coordinates/versions/purpose and host-compatibility conclusion.
 - Implementation package, Spring XML, capability inventory and configuration-list version.

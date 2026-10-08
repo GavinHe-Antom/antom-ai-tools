@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
-// Compare an authorized SDK with maintained API snapshots. Never download or redistribute the SDK.
+// Compare the bundled SDK, or an explicit local override, with maintained API snapshots.
 import fs from 'node:fs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
@@ -74,7 +74,8 @@ export function readBytecode(output) {
         const line = raw.trim();
         const header = line.match(/^(?:public\s+)?(?:(?:final|abstract)\s+)*(class|interface)\s+([\w.$]+)(.*)$/);
         if (header) {
-            current = {fields: [], enums: [], methods: [], ...inheritanceHeader(header[3])};
+            current = {fields: [], enums: [], methods: [], interfaceType: header[1] === 'interface',
+                ...inheritanceHeader(header[3])};
             current.enumType = current.extends.some(parent => parent.startsWith('java.lang.Enum<'));
             // Enum's implicit JDK parent is not a declared SDK inheritance contract.
             if (current.enumType) current.extends = [];
@@ -99,7 +100,10 @@ export function readBytecode(output) {
         if (method) {
             const returnType = method[1].replace(/^(?:(?:static|final|abstract|default|synchronized)\s+)*/, '')
                 .replace(/^<[^>]+>\s*/, '');
-            current.methods.push({name: method[2], defaultMethod: /\bdefault\b/.test(method[1]),
+            // Java 8 javap omits "default"; public non-abstract, non-static interface methods are defaults.
+            const defaultMethod = current.interfaceType && !line.startsWith('private ')
+                && !/\b(?:abstract|static)\b/.test(method[1]);
+            current.methods.push({name: method[2], defaultMethod,
                 signature: `${method[2]}(${parameters(method[3]).join(',')}):${typeName(returnType)}`});
         }
     }
@@ -236,8 +240,8 @@ export function compareSnapshots(contracts, actual, referenceRoot) {
 }
 
 function main() {
-    const jar = path.resolve(process.argv[2] || path.join(skillRoot, 'scripts/ais-cli/sdk/common-sdk-1.5.2.jar'));
-    if (!fs.existsSync(jar)) throw new Error(`Obtain the authorized platform SDK separately and place it at ${jar}`);
+    const jar = path.resolve(process.argv[2] || path.join(skillRoot, 'scripts/aci-cli/sdk/common-sdk-1.5.2.jar'));
+    if (!fs.existsSync(jar)) throw new Error(`Bundled SDK is missing at ${jar}; restore the complete CLI distribution or supply an explicit local SDK path`);
     const referenceRoot = path.join(skillRoot, 'references/guide/reference');
     const contracts = JSON.parse(fs.readFileSync(path.join(referenceRoot, 'contracts.json'), 'utf8'));
     const javap = process.env.JAVA_HOME ? path.join(process.env.JAVA_HOME, 'bin/javap') : 'javap';

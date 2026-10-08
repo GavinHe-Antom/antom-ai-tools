@@ -1,4 +1,4 @@
-# SPI contract index
+# AIS SDK SPI Contract Index
 
 There are **3 interfaces and 12 methods**. Seven transaction methods and three notification methods have platform endpoints. The remaining two optional notification methods exist only as SDK
 contracts and are excluded from generation. The [browser ACS flow](../../07-notifications-and-callbacks.md#6-acs-browser-callback) is platform-owned, not an adapter SPI. An available endpoint does not mean every channel has registered it or completed the generated anonymous mapping extensions and security hooks.

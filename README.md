@@ -8,7 +8,7 @@ A one-stop repository for building AI-powered products with Antom payment integr
 |-------|-------------|
 | **antom-integration** | Integrate Antom payment products including One-time Payments, Tokenized Payment, and Subscription Payment. |
 | **antom-reconciliation-expert** | Reconciliation Report Analysis Expert — Parses local Settlement Detail report files (CSV/XLSX) for settlement amount validation, fee analysis, and reconciliation knowledge Q&A. |
-| **iais-channel-integration** | Build institution-side IAIS channel adapters: understand SPI contracts, implement field mappings and security rules, generate tailored projects, and verify testing and delivery requirements. |
+| **antom-channel-integration** | Use ACI to build institution-side AIS channel adapters: understand SPI contracts, implement field mappings and security rules, generate tailored projects, and verify testing and delivery requirements. |
 
 ## Available Plugins
 
@@ -207,55 +207,55 @@ Validate the settlement amounts in my report and show me any discrepancies.
 3. Fee amounts (such as interchangeFee, schemeFee) are displayed as-is from the report. The Skill does not perform reverse rate calculation on these fees.
 4. The Skill is updated in sync with Antom product iterations. It is recommended to periodically re-run the installation command to get the latest version.
 
-## iais-channel-integration
+## antom-channel-integration (ACI)
 
 ### What Problem Does It Solve
 
-This Skill helps external institution developers implement channel adapters for the IAIS reverse-integration platform. Unlike `antom-integration`, which guides merchants integrating Antom payment products, it focuses on implementing the platform's Java SPI contracts for institution protocols.
+Antom Channel Integration (ACI), provided as the `antom-channel-integration` Skill and CLI, helps external developers implement institution protocols against the AIS platform standard and SDK SPI contracts.
 
-It provides task-oriented guidance for SPI selection, request/response field mapping, security processing, platform-managed HTTP and routing, standard result-code mapping, testing, and delivery. The actual SDK supplied by the platform takes precedence over reference snapshots; institution-specific behavior requires confirmed protocol rules.
+It provides task-oriented guidance for SPI selection, request/response field mapping, security processing, platform-managed HTTP and routing, standard result-code mapping, testing, and delivery. The actual AIS SDK supplied by the platform takes precedence over reference snapshots; institution-specific behavior requires confirmed protocol rules.
 
 ### Skill and CLI Resources
 
-The shared source is [`skills/iais-channel-integration/`](skills/iais-channel-integration/). Its bundled [`AIS CLI`](skills/iais-channel-integration/scripts/ais-cli/README.md) contains Java source, FreeMarker templates, tests, and an arrow-key selection workflow:
+The shared source is [`skills/antom-channel-integration/`](skills/antom-channel-integration/). Its bundled [`ACI CLI`](skills/antom-channel-integration/scripts/aci-cli/README.md) contains Java source, FreeMarker templates, tests, AIS SDK 1.5.2 with its standalone consumer POM, and an arrow-key selection workflow:
 
-- `ais init` generates a separate adapter project for selected card/non-card capabilities, 3DS flows, notifications, and security rules.
-- `ais package` runs local build, test-evidence, dependency, and ordinary-JAR checks and produces delivery reports. It does not upload artifacts or change platform configuration.
+- `aci init` generates a separate adapter project for selected card/non-card capabilities, 3DS flows, notifications, and security rules.
+- `aci package` runs local build, test-evidence, dependency, and ordinary-JAR checks and produces delivery reports. It does not upload artifacts or change platform configuration.
 - The Skill answers integration questions and implements user-confirmed mappings and security rules in a designated adapter project; it does not deploy the platform or modify production configuration.
 
-The source and all required Skill references are included in the existing provider packages. Refresh your installed plugin to discover the added Skill; Gemini CLI and portable clients discover it under the shared `skills/` directory as well. No Antom MCP connection is required for its offline knowledge or local CLI workflows.
+Load or install the complete `skills/antom-channel-integration/` directory, including its references, scripts and SDK. Gemini CLI and portable clients discover it under the shared `skills/` directory. No Antom MCP connection is required for its offline knowledge or local CLI workflows.
 
 ### Getting Started
 
 For guidance only, load the Skill and ask a question; neither Java nor the platform SDK is required. For generation, use Java 8 and Maven 3.6.3+ on macOS/Linux. Windows is unverified. From the repository root:
 
 ```sh
-mvn -f skills/iais-channel-integration/scripts/ais-cli/pom.xml clean verify
-sh skills/iais-channel-integration/scripts/ais-cli/bin/ais --help
+mvn -f skills/antom-channel-integration/scripts/aci-cli/pom.xml clean verify
+sh skills/antom-channel-integration/scripts/aci-cli/bin/aci --help
 ```
 
-Before `init` or `package`, obtain the platform-authorized SDK 1.5.2 JAR and standalone consumer POM and place them in the CLI's local `sdk/` directory. They are not distributed in this repository. Use the arrow keys and Enter for interactive selection; agents and CI use the documented JSON configuration mode.
+AIS SDK 1.5.2 and its standalone consumer POM are included in the Skill's `scripts/aci-cli/sdk/` directory. After building, run `init` directly; no separate SDK download or setup is needed. Maven also produces `target/aci-cli-0.1.0.zip` with the executable JAR and SDK for standalone use. Use the arrow keys and Enter for interactive selection; agents and CI use the documented JSON configuration mode.
 
 ```sh
-sh skills/iais-channel-integration/scripts/ais-cli/bin/ais init --output ../my-channel-adapter
+sh skills/antom-channel-integration/scripts/aci-cli/bin/aci init --output ../my-channel-adapter
 ```
 
-Generation produces wiring and customization hooks, not completed institution behavior. Implement the mappings and security rules, prepare independent fixtures, and pass the real SPI tests before packaging. See the [quickstart](skills/iais-channel-integration/QUICKSTART.md), [SPI index](skills/iais-channel-integration/references/guide/reference/spi/README.md), [testing workflow](skills/iais-channel-integration/references/TESTING.md), and [delivery checklist](skills/iais-channel-integration/references/delivery.md).
+Generation produces wiring and customization hooks, not completed institution behavior. Implement the mappings and security rules, prepare independent fixtures, and pass the real SPI tests before packaging. See the [CLI setup](skills/antom-channel-integration/scripts/aci-cli/README.md#build-and-usage), [SPI index](skills/antom-channel-integration/references/guide/reference/spi/README.md), [testing workflow](skills/antom-channel-integration/references/TESTING.md), and [delivery checklist](skills/antom-channel-integration/references/delivery.md).
 
 ### Example Prompts
 
 ```text
-Use $iais-channel-integration to explain the platform/adapter responsibilities for pay and notifyPayment. Do not change files.
+Use $antom-channel-integration to explain the platform/adapter responsibilities for pay and notifyPayment. Do not change files.
 ```
 
 ```text
-Use $iais-channel-integration in my adapter directory. Implement pay, inquiryPayment and refund using the confirmed field mappings and security rules below. Add independent tests through the real SPI entry points and list any unresolved protocol details.
+Use $antom-channel-integration in my adapter directory. Implement pay, inquiryPayment and refund using the confirmed field mappings and security rules below. Add independent tests through the real SPI entry points and list any unresolved protocol details.
 ```
 
 ### Important Notes
 
 1. The platform owns channel identity, merchant context, domain/path configuration, HTTP transport, key lookup, and iPay forwarding. Adapters implement institution protocol adaptation through the provided platform services.
-2. Do not include real keys, production credentials, card data, or the separately licensed SDK in public issues or commits. Local build output and SDK files are ignored and excluded from provider synchronization.
+2. Do not include real keys, production credentials or card data in public issues or commits. Distribute the bundled SDK JAR and standalone consumer POM with the Skill and CLI; exclude local build output from Skill source packages.
 3. Passing local tests does not replace platform assembly validation, institution integration testing, or release approval.
 
 ## Repository Layout
@@ -270,8 +270,8 @@ mcp.json                                 # hosted Antom MCP connection
 .agents/plugins/marketplace.json
 skills/antom-integration/SKILL.md          # shared source of truth
 skills/antom-reconciliation-expert/        # reconciliation expert skill + scripts
-skills/iais-channel-integration/           # IAIS adapter integration skill + references
-  scripts/ais-cli/                        # Java CLI, templates, and regression tests
+skills/antom-channel-integration/           # ACI adapter integration skill + references
+  scripts/aci-cli/                        # Java CLI, templates, and regression tests
 providers/
   cursor/plugin/        # Cursor adapter
   claude/plugin/        # Claude Code adapter
@@ -283,7 +283,7 @@ Each provider package is self-contained and ships its own copy of the skill so e
 
 ## Sync Skills Across Providers
 
-When you edit `skills/<name>/...`, mirror the change into every provider package with:
+To prepare provider packages from the shared Skill sources, run:
 
 ```bash
 npm run sync-skills
@@ -297,7 +297,7 @@ The script copies every file under `skills/<name>/` into:
 - `providers/claude/plugin/skills/<name>/`
 - `providers/codex/plugins/<name>/skills/<name>/`
 
-Run it before committing skill changes so all editors stay in lockstep.
+Use this command when preparing provider packages. Maintain channel integration changes only in `skills/antom-channel-integration/` and this README.
 
 On GitHub, the [`sync-skills` workflow](.github/workflows/sync-skills.yml) watches `skills/**` and `scripts/sync-skills.mjs`. When `main` receives changes there, it runs `npm run sync-skills` and opens a `chore/sync-skills` PR with the mirrored provider copies — so you only need to edit the source-of-truth and merge the auto-generated PR.
 
@@ -320,4 +320,4 @@ Antom Technical Service — `TechnicalService@antom.com`
 
 MIT — see [`LICENSE`](LICENSE).
 
-The `iais-channel-integration` Skill and its AIS CLI retain their [Apache-2.0 license](skills/iais-channel-integration/LICENSE). CLI dependencies retain their own [third-party notices](skills/iais-channel-integration/scripts/ais-cli/THIRD-PARTY-NOTICES.md). This does not grant redistribution rights for the separately supplied platform SDK or institution protocols.
+The `antom-channel-integration` Skill and its ACI CLI retain their [Apache-2.0 license](skills/antom-channel-integration/scripts/aci-cli/THIRD-PARTY-NOTICES.md#component-license). CLI dependencies retain their own [third-party notices](skills/antom-channel-integration/scripts/aci-cli/THIRD-PARTY-NOTICES.md). AIS SDK 1.5.2 is included with the Skill and CLI distributions. Institution protocols and other platform libraries retain their own rights.

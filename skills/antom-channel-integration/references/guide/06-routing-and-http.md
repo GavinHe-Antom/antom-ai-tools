@@ -80,7 +80,7 @@ See [notifications](07-notifications-and-callbacks.md) for iPay paths.
 | Platform key integration | Passes shadow-related markers downstream from request context |
 | Tracer synchronization | Creates a fallback span if context is absent; attempts loadMode=2, instMock=O and mark=T for shadow requests |
 | iPay forwarding | Rebuilds loadmode=2 and markuid=0A from platform shadow context for sandbox requests; removes conflicting sandbox headers for normal requests. Both use the configured ipayDomain, not separate sandbox domains |
-| Request completion | Clears IaisRequestContext, pops/finishes spans created by this filter, and restores prior MDC shadow; does not promise to restore all propagation properties on an existing span |
+| Request completion | Clears the platform routing context, pops/finishes spans created by this filter, and restores prior MDC shadow; does not promise to restore all propagation properties on an existing span |
 
 **Sandbox handling is not limited to prod.** Do not create a separate dev/prod switch in the adapter.
 If fallback Tracer creation or marker updates fail, the filter logs a warning and continues; request-context shadow and logging markers are set independently. Channel egress can still select a sandbox route, but downstream services such as key lookup that depend on Tracer propagation must be verified in integration tests. Do not promise that all downstream systems retain sandbox identity after such failures.
@@ -124,4 +124,4 @@ If multiple institution API calls require routes beyond the operation model, con
 
 See the [HTTP reference](reference/http.md) for complete fields.
 
-Evidence: DomainControlConfig, ShadowTagInboundFilter, IaisRequestContext, DefaultPlatformChannelHttpService, DefaultHttpService, ChannelTransportCustomization and ChannelInvocationTemplate.
+Evidence: DomainControlConfig, ShadowTagInboundFilter, platform routing context, DefaultPlatformChannelHttpService, DefaultHttpService, ChannelTransportCustomization and ChannelInvocationTemplate.

@@ -34,7 +34,6 @@ coverage/
 .cache/
 .temp/
 .tmp/
-.codefuse/
 
 # Package locks (optional, uncomment if needed)
 # package-lock.json

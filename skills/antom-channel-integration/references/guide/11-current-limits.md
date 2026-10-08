@@ -4,7 +4,7 @@ This page records source-code facts and outstanding handoff questions, not featu
 
 | Item | Current status | Integration impact and action |
 | --- | --- | --- |
-| SDK artifact matching | CLI template 0.1.0 requires SDK 1.5.2; SDK is absent from the public repository | Obtain JAR and standalone consumer POM separately from the platform; verify actual APIs and artifacts |
+| SDK artifact matching | CLI template 0.1.0 includes AIS SDK 1.5.2 JAR and standalone consumer POM | Use the bundled files; verify actual APIs and artifact hashes |
 | Sandbox recognition and Tracer | Transactions use loadMode=2; notifications and ACS use URL isSandbox, default false. Tracer preparation/marking failures warn and continue | Preserve complete callback URLs; verify downstream services such as keys that rely on propagation; a sandbox domain alone is not end-to-end isolation |
 | Public callback URL preparation | The platform recognizes isSandbox but does not generate callback URLs or append the parameter automatically | Confirm the supplied/registered URL; the adapter only maps it without removing query parameters |
 | Generated SPI | Selected methods are wired with anonymous mapping extensions; enabled security hooks remain unfinished | Complete institution rules and per-method DeliveryTest; structure success is not business success |
@@ -27,7 +27,7 @@ This page records source-code facts and outstanding handoff questions, not featu
 | Asynchronous context | Routing depends on thread context | Do not switch threads for platform HTTP on your own |
 | Example idempotency header | Not idempotency storage | Confirm institution idempotency and platform retry policy |
 | SDK CacheService / MessageService | Interfaces remain; usable host implementations are not confirmed | Do not present them as delivered external integration services |
-| ais CLI | Source, init/package and versioned templates available; no automatic installation | Build and obtain authorized SDK first; Java 8, macOS/Linux; Windows unverified |
+| aci CLI | Source, init/package and versioned templates available; no automatic installation | Build the CLI or extract its binary ZIP; SDK is included; Java 8, macOS/Linux; Windows unverified |
 
 Define institution idempotency headers and extendInfo scope for each selected method; example headers and complete raw institution bodies are not default protocols.
 For a platform-supplied generic scaffold, also check [scaffold differences](../baseline-scaffold.md).

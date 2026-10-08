@@ -1,4 +1,4 @@
-# SDK Requests, Responses and Shared Objects
+# AIS SDK Requests, Responses and Shared Objects
 
 [API index](../spi/README.md) · [Integration guide](../../README.md)
 

@@ -1,4 +1,4 @@
-# Platform security API reference
+# AIS SDK Security API Reference
 
 [Security responsibilities](../05-security.md) · [Guide index](../README.md)
 

@@ -14,11 +14,11 @@ Read this only when the platform supplied the target project directly and it doe
 | Security helpers | May not forward SecurityCipherParameters | Complete forwarding against the actual SDK or call platform security directly; do not change protocol algorithms |
 | Tests | PaymentTemplateScenarioTest, RefundTemplateScenarioTest, SecurityExamplesTest and similar | Reference only existing files; acceptance tests must call real SPIs, not copied substitutes |
 
-The platform supplies the SDK JAR/POM separately, matching the target project's version. Do not reuse an unknown-version local file repository or change version strings alone.
+The CLI bundles AIS SDK 1.5.2 and its standalone consumer POM in sdk/. Confirm that a platform-supplied scaffold targets the same SDK version before using these files. Do not reuse an unknown-version local file repository or change version strings alone.
 
 ## Testing and delivery
 
 Read the target POM, test classes and resources before choosing `mvn clean verify` or an existing `-Dtest` class. Whether tests start Spring depends on the project. Local tests do not start SOFABoot or connect to real institutions.
 For markers such as ADAPTER_READY, determine whether an executable validator checks them; a constant value is not evidence of a passing test.
 
-Without adapter-spec.json and generation-lock.json required by the CLI, do not assume `ais package` can validate the project. First run real SPI tests with Maven and inspect dependencies/plain JARs, then record evidence using the [delivery checklist](delivery.md). Do not fabricate lock files to bypass checks.
+Without adapter-spec.json and generation-lock.json required by the CLI, do not assume `aci package` can validate the project. First run real SPI tests with Maven and inspect dependencies/plain JARs, then record evidence using the [delivery checklist](delivery.md). Do not fabricate lock files to bypass checks.

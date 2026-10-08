@@ -2,7 +2,7 @@
 
 ## 1. The problem the system solves
 
-The Antom integration platform receives standard payment requests from iPay and routes them to the designated channel adapter, which converts them to the institution protocol. Institution notifications are converted into standard iPay notifications. The integration deliverable is a JAR implementing the common-sdk SPIs. The platform owns service entry points, channel module assembly, domain control, network transport, foundational security services and runtime observability.
+The AIS platform receives standard payment requests from iPay and routes them to the designated channel adapter, which converts them to the institution protocol. Institution notifications are converted into standard iPay notifications. The integration deliverable is a JAR implementing the AIS SDK common-sdk SPIs. The platform owns service entry points, channel module assembly, domain control, network transport, foundational security services and runtime observability.
 
 Integrators do not need to copy platform controllers, implement a service registry or maintain another institution HTTP client. They must accurately implement institution fields, payloads, signing input and transaction-result semantics.
 
@@ -10,7 +10,7 @@ Integrators do not need to copy platform controllers, implement a service regist
 
 | Layer | Code/module | Owner | Responsibilities | Out of scope |
 | --- | --- | --- | --- | --- |
-| Standard contracts | `app/common/common-sdk` | Platform | SPI request/response models; platform HTTP, security and result-code interfaces | Spring containers, institution address configuration, platform service implementations |
+| AIS standard contracts | `app/common/common-sdk` | Platform | SPI request/response models; platform HTTP, security and result-code interfaces | Spring containers, institution address configuration, platform service implementations |
 | HTTP entry points | `app/web` | Platform | iPay/institution entry points, SOFA Facade references selected by channelCode, ACS 302 redirects | Institution field mapping |
 | Channel modules | `app/channel-modules/channel-integrations/*` | Platform | Module identity, Facade instances, capability registration, route injection before invocation, adapter assembly | Scanning all channel beans into the main application |
 | Shared processing | `channel-framework` | Platform | Facade templates, SPI capability gates, exception fallback, module-local platform service bridges | Institution-specific fields |

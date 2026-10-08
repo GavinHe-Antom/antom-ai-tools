@@ -31,14 +31,14 @@ mvn dependency:tree
 jar tf target/<artifactId>-<version>.jar
 ```
 
-Use Java 8. With the CLI configured, run `ais package --project . --json` for SDK, test, dependency-tree and plain-JAR checks; reports are in `target/ais-delivery/`.
+Use Java 8. With the CLI configured, run `aci package --project . --json` for SDK, test, dependency-tree and plain-JAR checks; reports are in `target/aci-delivery/`.
 common-sdk 1.5.2 comes from the `lib/repository` file Maven repository with provided scope. No install-sdk command is needed.
 This file repository is not a complete offline dependency cache: Spring and test libraries still need accessible repositories or local cache. The supplied JAR/POM must match common-sdk.version; do not mix different SDK versions in one package.
 
 ## 4. Deliverable checks
 
 - Plain adapter JAR, not executable Spring Boot fat JAR/Ark Biz; no main-application startup configuration.
-- Manifest Implementation-Version and IAIS-SDK-Version match delivery documentation.
+- Manifest Implementation-Version and IAIS-SDK-Version match the adapter and AIS SDK versions in delivery documentation.
 - Replace organization coordinates, use a unique package, and update Spring scan paths.
 - Do not include copied com/alipay/iacqintegrationhub/channel/sdk classes or bundle host Spring/logging implementations.
 - List coordinates/versions for added libraries and obtain host compatibility confirmation; a plain JAR does not automatically install its dependencies into the host.

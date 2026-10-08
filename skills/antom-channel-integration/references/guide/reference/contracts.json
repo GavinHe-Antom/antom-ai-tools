@@ -26,7 +26,7 @@
     "sdkJarSha256": "03e5c91190e1bdf7213f9c12e26197651ec16610cf33144ba3345d01062a2406",
     "consumerPomSha256": "1e8a31b05b3acee60bc916d344e11d216e659511569a59dcd5a509e5a9e6777d",
     "sourceRevisionStatus": "Historical source references include unpublished working-tree changes and are not a reproducible source checkout. The artifact hashes identify the inspected SDK; per-type source hashes remain historical evidence.",
-    "inheritanceReview": "Direct implemented interfaces were checked against the authorized artifact identified above; no SDK binary is redistributed."
+    "inheritanceReview": "Direct implemented interfaces were checked against the artifact identified above; the matching SDK JAR and standalone consumer POM are bundled with the Skill and CLI distributions."
   },
   "generatedFrom": "Java source contract snapshot; ChannelRequestContext, BaseChannelRequest.runtimeEnv and PaymentNotifyRequest.extendInfo refreshed from SDK source on 2026-09-29; callback SPI removal and ACS gateway DTO relocation refreshed on 2026-10-02, without re-auditing unrelated platform behavior; not a validation schema",
   "asOf": "2026-10-02",
@@ -548,7 +548,7 @@
       "qualifiedName": "com.alipay.iacqintegrationhub.channel.sdk.api.error.ResultCodeHelper",
       "source": "app/common/common-sdk/src/main/java/com/alipay/iacqintegrationhub/channel/sdk/api/error/ResultCodeHelper.java",
       "sha256": "93be67b63cc3d2609a2435a418d6d7b1b7ed44d56b9d258e7fe63cb41344fcbb",
-      "description": "Result-code mapping utility (static facade).\n<p>\nCallers use these static methods to map channel error codes to internal platform codes.\nA separate implementation project supplies {@link ResultCodeService}.\n<p>\nChoose one registration mechanism:\n<ol>\n  <li><b>SPI discovery</b>: create {@code com.alipay.iacqintegrationhub.channel.sdk.api.error.ResultCodeService} under {@code META-INF/services/} in the implementation project; its contents are the implementation's fully qualified class name.</li>\n  <li><b>Manual registration</b>: call {@link #register(ResultCodeService)} at application startup.</li>\n</ol>\n\n@version ResultCodeHelper.java, v 0.1 2026-06-25 11:50 bohuliang\n",
+      "description": "Result-code mapping utility (static facade).\n<p>\nCallers use these static methods to map channel error codes to internal platform codes.\nA separate implementation project supplies {@link ResultCodeService}.\n<p>\nChoose one registration mechanism:\n<ol>\n  <li><b>SPI discovery</b>: create {@code com.alipay.iacqintegrationhub.channel.sdk.api.error.ResultCodeService} under {@code META-INF/services/} in the implementation project; its contents are the implementation's fully qualified class name.</li>\n  <li><b>Manual registration</b>: call {@link #register(ResultCodeService)} at application startup.</li>\n</ol>\n",
       "extends": [],
       "imports": [
         "com.alipay.iacqintegrationhub.channel.sdk.model.base.Result",
@@ -672,7 +672,7 @@
       "qualifiedName": "com.alipay.iacqintegrationhub.channel.sdk.api.error.ResultCodeService",
       "source": "app/common/common-sdk/src/main/java/com/alipay/iacqintegrationhub/channel/sdk/api/error/ResultCodeService.java",
       "sha256": "c93af4462dce5b88d32d3948f3d6e6db2ad1f765f63d68bfc44a99d874842fc5",
-      "description": "Contract for mapping channel result codes to a platform Result, implemented through platform queries to parameter-center AisResultCodeConfig.\nMultilevel original codes are matched as one combined query value; individual levels are not independently classified as successful. api limits configuration applicability.\nThe current platform implementation returns UNKNOWN for no match or an unsuccessful query response; exceptions thrown during invocation still propagate.\n\n@version ErrorCodeService.java, v 0.1 2026-06-25 11:43 bohuliang\n",
+      "description": "Contract for mapping channel result codes to a platform Result, implemented through platform queries to parameter-center AisResultCodeConfig.\nMultilevel original codes are matched as one combined query value; individual levels are not independently classified as successful. api limits configuration applicability.\nThe current platform implementation returns UNKNOWN for no match or an unsuccessful query response; exceptions thrown during invocation still propagate.\n",
       "extends": [],
       "imports": [
         "com.alipay.iacqintegrationhub.channel.sdk.model.base.Result"
@@ -911,7 +911,7 @@
       "qualifiedName": "com.alipay.iacqintegrationhub.channel.sdk.api.facade.NotifyFacade",
       "source": "app/common/common-sdk/src/main/java/com/alipay/iacqintegrationhub/channel/sdk/api/facade/NotifyFacade.java",
       "sha256": "a748b7b105c81fe49acd6ce325e342e470e2dbd2aae3f8a6781e981ab7a9f4c4",
-      "description": "Notification and browser-return entry points exposed by channel SOFA modules to the platform Web layer.\nThe platform finds implementations by channel uniqueId. An implementation first invokes the adapter to convert the channel protocol, then calls the platform iPay gateway service.\nThis contract exposes only payment, capture and refund notifications plus ACS callbacks, not every notification SPI in the SDK.\n\n@version NotifyFacade.java, v 0.1 2026-08-10 14:08 bohuliang\n",
+      "description": "Notification and browser-return entry points exposed by channel SOFA modules to the platform Web layer.\nThe platform finds implementations by channel uniqueId. An implementation first invokes the adapter to convert the channel protocol, then calls the platform iPay gateway service.\nThis contract exposes only payment, capture and refund notifications plus ACS callbacks, not every notification SPI in the SDK.\n",
       "extends": [],
       "imports": [
         "com.alipay.iacqintegrationhub.channel.sdk.api.gateway.response.AcsUrlCallbackResponse",
@@ -1879,7 +1879,7 @@
       "qualifiedName": "com.alipay.iacqintegrationhub.channel.sdk.api.security.PlatformChannelSecurityService",
       "source": "app/common/common-sdk/src/main/java/com/alipay/iacqintegrationhub/channel/sdk/api/security/PlatformChannelSecurityService.java",
       "sha256": "c25eb28e2e98493066c7afe68e9aa1082bc0a83092dccab12b68216e9e38a1a1",
-      "description": "Platform security operations using the latest active merchant key.\nAdapters compose canonical text; the platform owns subject construction and key lookup.\nEach operation has a dedicated request and does not accept historical key versions.\n\n@author IAIS\n@version PlatformChannelSecurityService.java, v 0.1 2026-09-17 IAIS",
+      "description": "Platform security operations using the latest active merchant key.\nAdapters compose canonical text; the platform owns subject construction and key lookup.\nEach operation has a dedicated request and does not accept historical key versions.",
       "extends": [],
       "imports": [],
       "fields": [],
@@ -1970,7 +1970,7 @@
       "qualifiedName": "com.alipay.iacqintegrationhub.channel.sdk.api.security.SecurityCipherAlgorithm",
       "source": "app/common/common-sdk/src/main/java/com/alipay/iacqintegrationhub/channel/sdk/api/security/SecurityCipherAlgorithm.java",
       "sha256": "23eb9bcfd37f989a28835592435c51a943e4ba2194569efaf6ec2fac9f2ddaed",
-      "description": "Algorithms registered by IBCM EncryptHelper. Names match the IBCM registry exactly.\nMode, padding and algorithm-specific options belong to SecurityCipherParameters.\n\n@author IAIS\n@version SecurityCipherAlgorithm.java, v 0.1 2026-09-17 IAIS",
+      "description": "Algorithms registered by IBCM EncryptHelper. Names match the IBCM registry exactly.\nMode, padding and algorithm-specific options belong to SecurityCipherParameters.",
       "extends": [],
       "imports": [],
       "fields": [],
@@ -2043,7 +2043,7 @@
       "qualifiedName": "com.alipay.iacqintegrationhub.channel.sdk.api.security.SecurityCipherType",
       "source": "app/common/common-sdk/src/main/java/com/alipay/iacqintegrationhub/channel/sdk/api/security/SecurityCipherType.java",
       "sha256": "a322ea9fd57f96212aa83c2a93e46f6a3e396741a88390de550ddba2de871c05",
-      "description": "Encryption categories; the platform rejects mismatched algorithms.\n\n@author IAIS\n@version SecurityCipherType.java, v 0.1 2026-09-17 IAIS",
+      "description": "Encryption categories; the platform rejects mismatched algorithms.",
       "extends": [],
       "imports": [],
       "fields": [],
@@ -2069,7 +2069,7 @@
       ],
       "source": "app/common/common-sdk/src/main/java/com/alipay/iacqintegrationhub/channel/sdk/api/security/SecurityDecryptRequest.java",
       "sha256": "09c89b243bb4b492d17fada6168ba4db57b02c8c3dc551c21f30de75a1bbf5e9",
-      "description": "Decryption input; pass the same IV, AAD and block parameters used during encryption.\n\n@author IAIS\n@version SecurityDecryptRequest.java, v 0.1 2026-09-17 IAIS",
+      "description": "Decryption input; pass the same IV, AAD and block parameters used during encryption.",
       "extends": [],
       "imports": [
         "lombok.*",
@@ -2122,7 +2122,7 @@
       "qualifiedName": "com.alipay.iacqintegrationhub.channel.sdk.api.security.SecurityDigestAlgorithm",
       "source": "app/common/common-sdk/src/main/java/com/alipay/iacqintegrationhub/channel/sdk/api/security/SecurityDigestAlgorithm.java",
       "sha256": "821a979cd861f0ea6933f73ec6524de0b72387c989e31e8bbb7b26e9526dfcfa",
-      "description": "Unkeyed SHA digests; these do not authenticate a sender.\n\n@author IAIS\n@version SecurityDigestAlgorithm.java, v 0.1 2026-09-17 IAIS",
+      "description": "Unkeyed SHA digests; these do not authenticate a sender.",
       "extends": [],
       "imports": [],
       "fields": [],
@@ -2153,7 +2153,7 @@
       ],
       "source": "app/common/common-sdk/src/main/java/com/alipay/iacqintegrationhub/channel/sdk/api/security/SecurityDigestRequest.java",
       "sha256": "03f3ae78c334e80421b9d435c704aedf4a8db6e799b6ea16fc1375398c3b236f",
-      "description": "Unkeyed digest input; does not identify a merchant or query key material.\n\n@author IAIS\n@version SecurityDigestRequest.java, v 0.1 2026-09-17 IAIS",
+      "description": "Unkeyed digest input; does not identify a merchant or query key material.",
       "extends": [],
       "imports": [
         "lombok.*",
@@ -2221,7 +2221,7 @@
       ],
       "source": "app/common/common-sdk/src/main/java/com/alipay/iacqintegrationhub/channel/sdk/api/security/SecurityEncryptRequest.java",
       "sha256": "c714478692436777fdf8fbc47e5d861899dcb4b1558479e8c082e2462b7f9499",
-      "description": "Encryption input; algorithm parameters and output formats follow IBCM EncryptHelper.\n\n@author IAIS\n@version SecurityEncryptRequest.java, v 0.1 2026-09-17 IAIS",
+      "description": "Encryption input; algorithm parameters and output formats follow IBCM EncryptHelper.",
       "extends": [],
       "imports": [
         "lombok.*",
@@ -2610,7 +2610,7 @@
       ],
       "source": "app/common/common-sdk/src/main/java/com/alipay/iacqintegrationhub/channel/sdk/api/security/SecurityKeyRequest.java",
       "sha256": "8f5477d34abeae1bda1c0e2ed00fafb8a3d35055903e632f80f3fdc8f139d22f",
-      "description": "Latest-key lookup for custom adapter calculation, without plaintext, internal subject or tenant fields.\nThe platform adds the AIS_ALIPAY_ prefix to the business merchant identifier.\n\n@author IAIS\n@version SecurityKeyRequest.java, v 0.1 2026-09-17 IAIS",
+      "description": "Latest-key lookup for custom adapter calculation, without plaintext, internal subject or tenant fields.\nThe platform adds the AIS_ALIPAY_ prefix to the business merchant identifier.",
       "extends": [],
       "imports": [
         "lombok.AllArgsConstructor",
@@ -2678,7 +2678,7 @@
       "qualifiedName": "com.alipay.iacqintegrationhub.channel.sdk.api.security.SecuritySignAlgorithm",
       "source": "app/common/common-sdk/src/main/java/com/alipay/iacqintegrationhub/channel/sdk/api/security/SecuritySignAlgorithm.java",
       "sha256": "dd6943608a0d9ec742b69c67ee1580629a1c6f9d74e1bcd89226b0eaeceaf745",
-      "description": "IBCM keyed-signature catalogue, not a guarantee that every protocol is enabled.\nReserved protocols fail explicitly until their platform material and protocol requirements are implemented.\nNames preserve the IBCM registry spelling; unkeyed digests and encryption-only entries are excluded.\n\n@author IAIS\n@version SecuritySignAlgorithm.java, v 0.1 2026-09-17 IAIS",
+      "description": "IBCM keyed-signature catalogue, not a guarantee that every protocol is enabled.\nReserved protocols fail explicitly until their platform material and protocol requirements are implemented.\nNames preserve the IBCM registry spelling; unkeyed digests and encryption-only entries are excluded.",
       "extends": [],
       "imports": [],
       "fields": [],
@@ -2774,7 +2774,7 @@
       ],
       "source": "app/common/common-sdk/src/main/java/com/alipay/iacqintegrationhub/channel/sdk/api/security/SecuritySignRequest.java",
       "sha256": "caee17dd7ddacad7352f0eb27a88847719509faacf1952e67683547b3457126c",
-      "description": "Signing input; the platform selects the latest merchant key.\n\n@author IAIS\n@version SecuritySignRequest.java, v 0.1 2026-09-17 IAIS",
+      "description": "Signing input; the platform selects the latest merchant key.",
       "extends": [],
       "imports": [
         "lombok.*",
@@ -2816,7 +2816,7 @@
       ],
       "source": "app/common/common-sdk/src/main/java/com/alipay/iacqintegrationhub/channel/sdk/api/security/SecurityVerifyRequest.java",
       "sha256": "cc6e7bbe2a67d03e4de1b85748031ebf2b4b0d2c2f26cd94d522adaa8b4a8d6c",
-      "description": "Verification input; only the latest active key is considered.\n\n@author IAIS\n@version SecurityVerifyRequest.java, v 0.1 2026-09-17 IAIS",
+      "description": "Verification input; only the latest active key is considered.",
       "extends": [],
       "imports": [
         "lombok.*",
@@ -5624,7 +5624,7 @@
       "qualifiedName": "com.alipay.iacqintegrationhub.channel.sdk.spi.payment.request.AuthorizeRequest",
       "source": "app/common/common-sdk/src/main/java/com/alipay/iacqintegrationhub/channel/sdk/spi/payment/request/AuthorizeRequest.java",
       "sha256": "40a30af459a35525af5d5daf241dfa8d7201d016dd94e3c8d821bc6d1fc36b03",
-      "description": "Authorization business field model containing amount, order, payment instrument and subsequent redirect/notification URLs.\nThe authentication/authorization SPI uses AuthenticateAuthorizeRequest. This separately retained type does not imply an exposed entry point merely because of its name.\n\n@version AuthorizeRequest.java, v 0.1 2026-06-25 17:41 bohuliang\n",
+      "description": "Authorization business field model containing amount, order, payment instrument and subsequent redirect/notification URLs.\nThe authentication/authorization SPI uses AuthenticateAuthorizeRequest. This separately retained type does not imply an exposed entry point merely because of its name.\n",
       "extends": [
         "BaseChannelRequest"
       ],
@@ -6036,7 +6036,7 @@
       "qualifiedName": "com.alipay.iacqintegrationhub.channel.sdk.spi.payment.response.AuthorizeResponse",
       "source": "app/common/common-sdk/src/main/java/com/alipay/iacqintegrationhub/channel/sdk/spi/payment/response/AuthorizeResponse.java",
       "sha256": "5dddfad326ca04e349491dd579a99be985920e4bfba410b3b3ef31b61a9bf60c",
-      "description": "Authorization response model containing only the unified Result.\nThe authentication/authorization SPI actually returns AuthenticateAuthorizeResponse; retaining this model does not add a separate authorization API.\n\n@version AuthorizeResponse.java, v 0.1 2026-06-25 17:48 bohuliang\n",
+      "description": "Authorization response model containing only the unified Result.\nThe authentication/authorization SPI actually returns AuthenticateAuthorizeResponse; retaining this model does not add a separate authorization API.\n",
       "extends": [
         "BaseResponse"
       ],
@@ -6555,7 +6555,7 @@
         }
       ],
       "sha256": "ad77be5386b4a3352b9c60b010d08f4035ae007230c26f32fc405681fc843f5d",
-      "description": "Block modes understood by IBCM; not every algorithm supports every mode.\n\n@author IAIS\n@version SecurityCipherMode.java, v 0.1 2026-09-24 IAIS"
+      "description": "Block modes understood by IBCM; not every algorithm supports every mode."
     },
     {
       "name": "SecurityCipherPadding",
@@ -6613,7 +6613,7 @@
         }
       ],
       "sha256": "acdec6be44dab98d91068bbb552556dd07d785f296b447534bf0dc4758b0c543",
-      "description": "Padding identifiers matching IBCM AlgorithmPadding, subject to algorithm/runtime support.\n\n@author IAIS\n@version SecurityCipherPadding.java, v 0.1 2026-09-24 IAIS"
+      "description": "Padding identifiers matching IBCM AlgorithmPadding, subject to algorithm/runtime support."
     },
     {
       "name": "SecurityCipherParameters",
@@ -6685,7 +6685,7 @@
       "methods": [],
       "enumValues": [],
       "sha256": "aea6038fa71757cd47167baa63f11f0bdf0c4d0fc9f2fb070a5715a436cb39b0",
-      "description": "Named IBCM encryption options; unrelated options are rejected rather than silently ignored.\n\n@author IAIS\n@version SecurityCipherParameters.java, v 0.1 2026-09-24 IAIS"
+      "description": "Named IBCM encryption options; unrelated options are rejected rather than silently ignored."
     },
     {
       "name": "SecurityPgpCipherAlgorithm",
@@ -6763,7 +6763,7 @@
         }
       ],
       "sha256": "f996fadc4abe8f6894536bf9944ac4852c0c64d15090f0ffa050363c73eb26ca",
-      "description": "PGP cipher identifiers from IBCM. Legacy algorithms require institution agreement.\nIBCM NULL is intentionally excluded because it performs no encryption.\n\n@author IAIS\n@version SecurityPgpCipherAlgorithm.java, v 0.1 2026-09-24 IAIS"
+      "description": "PGP cipher identifiers from IBCM. Legacy algorithms require institution agreement.\nIBCM NULL is intentionally excluded because it performs no encryption."
     },
     {
       "name": "SecurityPgpHashAlgorithm",
@@ -6831,7 +6831,7 @@
         }
       ],
       "sha256": "bb4fe6fa097596739827a6dd03c1189e33965d16495d3d05606d7486e839e17f",
-      "description": "PGP hash identifiers from IBCM; availability depends on its PGP implementation.\nPrefer SHA256 or stronger; legacy/reserved choices are not recommended.\n\n@author IAIS\n@version SecurityPgpHashAlgorithm.java, v 0.1 2026-09-24 IAIS"
+      "description": "PGP hash identifiers from IBCM; availability depends on its PGP implementation.\nPrefer SHA256 or stronger; legacy/reserved choices are not recommended."
     },
     {
       "name": "SecurityPgpParameters",
@@ -6881,9 +6881,9 @@
       "methods": [],
       "enumValues": [],
       "sha256": "b9d9f0af5f4a438344540f35d714893b1f8c91d7e38896980d883c7c85d97042",
-      "description": "PGP envelope options. Public/private keys and the private-key password are queried by the platform.\n\n@author IAIS\n@version SecurityPgpParameters.java, v 0.1 2026-09-24 IAIS"
+      "description": "PGP envelope options. Public/private keys and the private-key password are queried by the platform."
     }
   ],
   "adapterTemplateNote": "SPI extension metadata refers to CLI template 0.1.0 anonymous ChannelApiExtension or ChannelNotificationExtension inside each selected SPI method; no customize/api helper classes are generated. Business hooks and enabled securityFeatures platform-call examples require protocol implementation. Types remain the SDK source snapshot.",
-  "artifactAlignmentNote": "CLI template 0.1.0 requires SDK 1.5.2 Jar and standalone consumer POM supplied separately by the platform. The public repository contains no SDK artifacts. Verify actual APIs and artifact hashes before use."
+  "artifactAlignmentNote": "ACI CLI template 0.1.0 includes AIS SDK 1.5.2 JAR and standalone consumer POM in scripts/aci-cli/sdk/. The repository, Skill/provider packages and CLI ZIP distribute these artifacts. Verify actual APIs and artifact hashes before use."
 }

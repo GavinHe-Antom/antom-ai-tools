@@ -1,12 +1,12 @@
 ---
 name: antom-channel-integration
-description: Help developers understand Antom channel integration contracts, implement and test payment adapters from institution field mappings and security rules, and verify delivery materials. Use for integration questions, capability selection, protocol adaptation and troubleshooting; do not deploy the platform or change production configuration.
+description: Help external developers use Antom Channel Integration (ACI) to implement and test channel adapters against the AIS platform standard and SDK contracts. Use for integration questions, capability selection, protocol adaptation and troubleshooting; do not deploy the platform or change production configuration.
 license: Apache-2.0
 ---
 
-# Antom Channel Integration Assistant
+# antom-channel-integration (ACI)
 
-Turn institution protocols into testable, deliverable adapters. Answer knowledge-only questions without changing files. For implementation requests, edit the user's designated adapter project, not the Skill installation directory.
+Antom Channel Integration (ACI) is Antom's channel integration tool for external developers implementing adapters against the AIS platform standard. Answer knowledge-only questions without changing files. For implementation requests, edit the user's designated adapter project, not the Skill installation directory.
 
 ## Choose the task before acting
 
@@ -17,11 +17,17 @@ Turn institution protocols into testable, deliverable adapters. Answer knowledge
 | Implement or change an adapter | Inspect the designated project and follow the [implementation workflow](references/implementation-workflow.md). Preserve unrelated work; do not run init over an existing project. |
 | Validate or prepare delivery | Follow [testing](references/TESTING.md) and [delivery](references/delivery.md). Report what actually ran and what remains unverified. |
 
-Generation intake collects payment/3DS scope, transaction and notification choices, a separate free-text institution code, and only two security yes/no choices. Derive identifiers directly without a naming-approval round. The complete questions, dependency rules and naming conventions live in project generation; do not duplicate or replace them with example defaults. Keep generated source and documentation in English.
+Generation intake collects payment/3DS scope, transaction and notification choices, a separate free-text institution name/code field, and only two security yes/no choices. Derive identifiers directly without a naming-approval round. The complete questions, dependency rules and naming conventions live in project generation; do not duplicate or replace them with example defaults. Keep generated source and documentation in English.
+
+## Ask for missing information
+
+Ask in the user's language with only a short field label or question and the necessary choices. Retain supplied answers; omit known fields. Keep SDK details, SPI dependencies, generated identifiers, implementation advice and progress summaries out of the questionnaire. For an actual conflict, add only the one sentence needed to resolve it.
+
+Use the available question/input tool instead of a chat-only question. Institution names and codes require their own free-text input box with no options, examples, placeholder or default. In Codex, use `request_user_input_async` with a `title` and omit `options`; use an equivalent free-text question tool in other clients. Fall back to one short chat question only when the client has no suitable input tool. See the [generation intake](references/project-generation.md#confirm-the-generation-inputs) for which fields are required.
 
 ## Establish the sources of truth
 
-- **API facts:** the target project's actual SDK types, fields, methods and default implementations take precedence over this package's snapshot. Use `jar tf` and `javap` when only a JAR is available; developers do not need access to platform source code.
+- **API facts:** the target project's actual AIS SDK types, fields, methods and default implementations take precedence over this package's snapshot. Use `jar tf` and `javap` when only a JAR is available; developers do not need access to platform source code.
 - **Business rules:** the institution protocol and user-confirmed mappings, signing input and success criteria determine behavior. Examples are not institution rules.
 - **Operational status:** distinguish SDK declarations, adapter implementations, platform registrations and connected entry points. Passing unit tests does not mean institution integration testing has passed.
 - Read the references below as needed. Identify unresolved SDK or protocol differences explicitly; do not silently change algorithms, invent business defaults or claim unsupported capabilities.
@@ -41,7 +47,7 @@ Generation intake collects payment/3DS scope, transaction and notification choic
 | Test and troubleshoot | [Testing workflow](references/TESTING.md) | Relevant protocol, security and API references |
 | Package and deliver | [Delivery checklist](references/delivery.md) | [Platform handoff](references/guide/09-platform-handoff.md) |
 
-Implementation and testing references target projects generated by CLI 0.1.0 by default. Inspect the target project's structure first. Read [baseline scaffold differences](references/baseline-scaffold.md) only when using the generic scaffold supplied by the platform. CLI source and templates are bundled in `scripts/ais-cli/`; installing the Skill does not build the CLI or supply the SDK. Follow the [quickstart](QUICKSTART.md) for local setup.
+Implementation and testing references target projects generated by CLI 0.1.0 by default. Inspect the target project's structure first. Read [baseline scaffold differences](references/baseline-scaffold.md) only when using the generic scaffold supplied by the platform. CLI source, templates and AIS SDK 1.5.2 with its standalone consumer POM are bundled in `scripts/aci-cli/`; installing the Skill does not build the CLI. After building, `init` uses the bundled SDK automatically. Follow the [CLI build and usage guide](scripts/aci-cli/README.md#build-and-usage) for local setup.
 
 For field questions, locate the method first, then follow its type references; do not load the entire [contracts.json](references/guide/reference/contracts.json) at once.
 Use the [rules template](assets/integration-rules-template.md) to collect required information and synthetic scenarios.
@@ -61,7 +67,7 @@ Missing rules block only the affected implementation; continue independent work 
 
 ## Output and completion criteria
 
-- Questions: state the applicable version, key boundaries and reference locations.
+- Contract answers: state the applicable AIS SDK version and reference locations.
 - Implementation: list changed files, selected methods, implemented rules and unresolved items.
 - Validation: report actual commands and passed/failed/not-run results; never count skipped checks as passed.
 - Delivery: distinguish local tests, host validation and institution integration testing; list outstanding platform registration, routing, key and result-code configuration.

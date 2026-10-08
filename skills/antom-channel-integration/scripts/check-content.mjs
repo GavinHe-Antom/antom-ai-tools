@@ -6,7 +6,7 @@ import {fileURLToPath} from 'node:url';
 import assert from 'node:assert/strict';
 
 const skillRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const excluded = new Set(['target', 'sdk', 'node_modules', '.git', '.gitnexus', '.idea', '.codefuse', '.DS_Store', '__pycache__']);
+const excluded = new Set(['target', 'node_modules', '.git', '.gitnexus', '.idea', '.codefuse', '.DS_Store', '__pycache__']);
 
 /** Match rendered heading anchors, including repeated headings and explicit HTML IDs. */
 function markdownAnchors(content) {
@@ -26,7 +26,7 @@ function markdownAnchors(content) {
     return anchors;
 }
 
-/** Check the distributable tree without changing it or reading ignored SDK/build directories. */
+/** Check the distributable tree including bundled SDK files, without changing it or reading build output. */
 export function checkContent(root = skillRoot) {
     const files = [];
     const pending = [root];
@@ -46,7 +46,7 @@ export function checkContent(root = skillRoot) {
     const anchorCache = new Map();
     for (const file of files) {
         const relative = path.relative(root, file);
-        const textFile = /\.(?:md|txt|ftl|java|xml|mjs|json|ya?ml)$/.test(file) || relative === 'scripts/ais-cli/bin/ais';
+        const textFile = /\.(?:md|txt|ftl|java|xml|pom|mjs|json|ya?ml)$/.test(file) || relative === 'scripts/aci-cli/bin/aci';
         if (textFile) {
             const content = fs.readFileSync(file, 'utf8');
             assert(!/\p{Script=Han}/u.test(content), `Use English in Skill and CLI content: ${relative}`);
@@ -79,8 +79,19 @@ export function checkContent(root = skillRoot) {
     assert(skill.startsWith('---\nname: antom-channel-integration\n'));
     assert(skill.includes('license: Apache-2.0'));
     assert(skill.split('\n').length < 300, 'Keep Skill routing instructions concise');
-    assert(fs.existsSync(path.join(root, 'LICENSE')), 'Retain the component license');
-    assert(fs.existsSync(path.join(root, 'scripts/ais-cli/pom.xml')), 'Bundle CLI source with the Skill');
+    const noticesFile = path.join(root, 'scripts/aci-cli/THIRD-PARTY-NOTICES.md');
+    assert(fs.existsSync(noticesFile), 'Retain the component license in THIRD-PARTY-NOTICES.md');
+    const componentLicense = fs.readFileSync(noticesFile, 'utf8')
+        .match(/^## Component license[ \t]*\r?\n([\s\S]*?)(?=^#{1,2}[ \t]+|(?![\s\S]))/m)?.[1];
+    assert(componentLicense, 'Retain the component license section in THIRD-PARTY-NOTICES.md');
+    assert(['Apache License', 'Version 2.0', 'END OF TERMS AND CONDITIONS'].every(marker => componentLicense.includes(marker)),
+        'Retain the complete component Apache-2.0 license in THIRD-PARTY-NOTICES.md');
+    assert(fs.existsSync(path.join(root, 'scripts/aci-cli/pom.xml')), 'Bundle CLI source with the Skill');
+    for (const name of ['common-sdk-1.5.2.jar', 'common-sdk-1.5.2.pom']) {
+        const artifact = path.join(root, 'scripts/aci-cli/sdk', name);
+        assert(fs.existsSync(artifact) && fs.statSync(artifact).isFile() && fs.statSync(artifact).size > 0,
+            `Bundle the SDK JAR and standalone consumer POM with the CLI: ${name}`);
+    }
     const resultRows = fs.readFileSync(path.join(root, 'references/result-code-catalog.md'), 'utf8')
         .split('\n').filter(line => line.trim().startsWith('|'));
     assert(resultRows.length > 0, 'Result-code tables must exist');

@@ -11,7 +11,6 @@
 //   npm run sync-skills
 
 import { promises as fs } from "node:fs";
-import { execFileSync } from "node:child_process";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -32,14 +31,11 @@ const FLAT_TARGETS = [
   path.join(repoRoot, "providers/claude/plugin/skills"),
 ];
 
-async function* walk(dir, eligibleFiles, eligibleDirectories) {
+async function* walk(dir) {
   for (const entry of await fs.readdir(dir, { withFileTypes: true })) {
     const p = path.join(dir, entry.name);
-    if (entry.isDirectory() && eligibleDirectories.has(p)) {
-      yield* walk(p, eligibleFiles, eligibleDirectories);
-    } else if (entry.isFile() && eligibleFiles.has(p)) {
-      yield p;
-    }
+    if (entry.isDirectory()) yield* walk(p);
+    else if (entry.isFile()) yield p;
   }
 }
 
@@ -61,28 +57,6 @@ const run = async () => {
     return;
   }
 
-  // Include tracked files and new, untracked skill files, but never traverse
-  // ignored build output or local SDKs. NUL delimiters preserve unusual names.
-  const gitFiles = execFileSync(
-    "git",
-    ["ls-files", "--cached", "--others", "--exclude-standard", "-z", "--", "skills/"],
-    { cwd: repoRoot, encoding: "utf8", maxBuffer: 10 * 1024 * 1024 },
-  );
-  const eligibleFiles = new Set();
-  const eligibleDirectories = new Set();
-
-  for (const relativeFile of gitFiles.split("\0")) {
-    if (!relativeFile) continue;
-
-    const file = path.join(repoRoot, relativeFile);
-    eligibleFiles.add(file);
-    let directory = path.dirname(file);
-    while (directory.startsWith(`${SOURCE_DIR}${path.sep}`)) {
-      eligibleDirectories.add(directory);
-      directory = path.dirname(directory);
-    }
-  }
-
   let writeCount = 0;
 
   for (const skill of skillNames) {
@@ -93,7 +67,7 @@ const run = async () => {
       path.join(CODEX_SKILLS_DIR, skill),
     ];
 
-    for await (const file of walk(skillSource, eligibleFiles, eligibleDirectories)) {
+    for await (const file of walk(skillSource)) {
       const rel = path.relative(skillSource, file);
       for (const target of targets) {
         const dest = path.join(target, rel);

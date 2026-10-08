@@ -1,4 +1,4 @@
-# Platform request context
+# AIS SDK Request Context
 
 [Integration guide](../README.md) · [Model index](models/README.md) · [Security API](security.md)
 
@@ -67,7 +67,7 @@ Cover unbound context, missing channel, missing merchant, missing environment, a
 
 ## Source
 
-SDK 1.5.2; snapshot date 2026-09-29. See `ChannelRequestContext` in [contracts.json](contracts.json) for method and thread semantics. Equal version numbers do not guarantee identical artifact contents; verify the SDK artifact SHA-256 at delivery.
+AIS SDK 1.5.2; snapshot date 2026-09-29. See `ChannelRequestContext` in [contracts.json](contracts.json) for method and thread semantics. Equal version numbers do not guarantee identical artifact contents; verify the SDK artifact SHA-256 at delivery.
 
 `app/common/common-sdk/src/main/java/com/alipay/iacqintegrationhub/channel/sdk/context/ChannelRequestContext.java`
 SHA-256: `4e839ca259774b370119f92ef9b5c75192b4550e5ed0b6203ac481fbc39b0c1d`

@@ -1,4 +1,4 @@
-# Adapter Unit Testing Guide
+# AIS Channel Adapter Unit Testing Guide
 
 ## 1. Test scope
 
@@ -32,7 +32,7 @@ Delivery requires actual passing, non-skipped structure, per-method security-flo
 
 Packaging also requires at least one confirmed returning case per selected SPI: category `success`, `processing` or `protocol` with an expectedResult object, not an expectedException. Deleting all return-path cases and leaving only expected errors cannot qualify a method for delivery. This is a minimal gate, not a fixed category quota or proof of full protocol coverage.
 
-Obtain SDK 1.5.2 and its standalone consumer POM separately. Generated projects use a local file repository and provided scope; other dependencies need accessible repositories or cache. When a Maven mirror covers all repositories, exclude `bundled-sdk`. Offline builds still need compatible settings and repository IDs.
+Use AIS SDK 1.5.2 and its standalone consumer POM bundled in the CLI's sdk/ directory. Generated projects use a local file repository and provided scope; other dependencies need accessible repositories or cache. When a Maven mirror covers all repositories, exclude `bundled-sdk`. Offline builds still need compatible settings and repository IDs.
 
 ## 3. Add independent protocol cases
 
@@ -78,7 +78,7 @@ The following illustrates the schema for a hypothetical protocol, not institutio
   "category": "success",
   "confirmed": true,
   "input": {"paymentRequestId": "order-001", "paymentAmount": {"currency": "USD", "value": "1250"}},
-  "context": {"present": true, "channelCode": "iaischannelexample", "merchantId": "synthetic-merchant", "runtimeEnv": null},
+  "context": {"present": true, "channelCode": "acichannelexample", "merchantId": "synthetic-merchant", "runtimeEnv": null},
   "http": {"calls": 1, "response": {"statusCode": 200, "headers": {}, "body": "{\"id\":\"institution-001\",\"state\":\"accepted\"}"}},
   "expectedRequest": {"method": "POST", "contentType": "JSON", "pathParameters": {}, "headers": {}, "queryParameters": {}, "formParameters": {}, "attributes": {}, "body": "{\"reference\":\"order-001\",\"amount\":1250}"},
   "security": {},

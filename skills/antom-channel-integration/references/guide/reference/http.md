@@ -1,4 +1,4 @@
-# Platform HTTP, routing, and result-code API reference
+# AIS SDK HTTP, Routing and Result-Code API Reference
 
 [Domain and HTTP guide](../06-routing-and-http.md) · [Mapping guide](../04-mapping-and-results.md)
 

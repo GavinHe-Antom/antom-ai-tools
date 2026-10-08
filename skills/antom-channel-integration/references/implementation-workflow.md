@@ -1,4 +1,4 @@
-# From Integration Rules to Adapter Code
+# From Integration Rules to AIS Channel Adapter Code
 
 Use this workflow when the user explicitly asks to implement, complete or fix an adapter. For knowledge questions, read the relevant reference instead.
 

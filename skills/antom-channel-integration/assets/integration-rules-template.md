@@ -1,4 +1,4 @@
-# Channel Integration Rules
+# AIS Channel Adapter Integration Rules
 
 Supply this to a developer or Agent. Reference specific institution protocol sections instead of repeating rules already documented there. Mark unknowns as "To confirm + impact" rather than guessing. Do not attach real keys or complete card credentials.
 
