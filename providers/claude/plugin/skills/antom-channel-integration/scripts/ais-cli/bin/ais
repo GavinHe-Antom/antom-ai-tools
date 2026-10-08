@@ -1,0 +1,12 @@
+#!/bin/sh
+# Run the built CLI without evaluating user-supplied arguments as shell code.
+set -eu
+AIS_BIN_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+if [ ! -f "$AIS_BIN_DIR/../target/ais-cli.jar" ]; then
+    echo "Build the CLI first: mvn -f \"$AIS_BIN_DIR/../pom.xml\" clean verify" >&2
+    exit 3
+fi
+if [ -n "${JAVA_HOME:-}" ]; then
+    exec "$JAVA_HOME/bin/java" "-Dais.cli.home=$AIS_BIN_DIR/.." -jar "$AIS_BIN_DIR/../target/ais-cli.jar" "$@"
+fi
+exec java "-Dais.cli.home=$AIS_BIN_DIR/.." -jar "$AIS_BIN_DIR/../target/ais-cli.jar" "$@"

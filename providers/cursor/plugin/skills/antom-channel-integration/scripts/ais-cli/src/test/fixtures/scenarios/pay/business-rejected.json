@@ -1,0 +1,97 @@
+{
+  "id": "business-rejected",
+  "category": "business-failure",
+  "confirmed": true,
+  "description": "Independent synthetic protocol sample, not an institution implementation.",
+  "input": {
+    "paymentRequestId": "synthetic-order",
+    "merchantId": "untrusted-body-merchant",
+    "paymentAmount": {
+      "currency": "USD",
+      "value": "1250"
+    }
+  },
+  "context": {
+    "present": true,
+    "channelCode": "example",
+    "merchantId": "synthetic-merchant",
+    "runtimeEnv": null
+  },
+  "http": {
+    "calls": 1,
+    "response": {
+      "statusCode": 422,
+      "headers": {
+        "Signature": "synthetic-response-signature"
+      },
+      "body": "{\"state\":\"declined\",\"code\":\"12\",\"message\":\"Declined\",\"payment_id\":\"synthetic-payment\"}"
+    }
+  },
+  "expectedRequest": {
+    "method": "POST",
+    "contentType": "JSON",
+    "pathParameters": {},
+    "headers": {
+      "Content-Type": "application/json; charset=utf-8",
+      "Signature": "synthetic-signature"
+    },
+    "queryParameters": {},
+    "formParameters": {},
+    "attributes": {},
+    "body": "{\"reference\":\"synthetic-order\",\"amount\":\"1250\",\"currency\":\"USD\"}"
+  },
+  "security": {
+    "requestSign": {
+      "calls": 1,
+      "request": {
+        "merchantId": "synthetic-merchant",
+        "algorithm": "HMAC_SHA256_BASE64",
+        "content": "{\"reference\":\"synthetic-order\",\"amount\":\"1250\",\"currency\":\"USD\"}"
+      },
+      "result": "synthetic-signature"
+    },
+    "responseVerify": {
+      "calls": 1,
+      "request": {
+        "merchantId": "synthetic-merchant",
+        "algorithm": "HMAC_SHA256_BASE64",
+        "content": "{\"state\":\"declined\",\"code\":\"12\",\"message\":\"Declined\",\"payment_id\":\"synthetic-payment\"}",
+        "signature": "synthetic-response-signature"
+      },
+      "result": true
+    }
+  },
+  "resultCode": [
+    {
+      "calls": 1,
+      "request": {
+        "channelCode": "example",
+        "channelResultCode": "12",
+        "channelResultMsg": "Declined",
+        "api": "pay"
+      },
+      "result": {
+        "resultStatus": "F",
+        "resultCode": "PAYMENT_REJECTED",
+        "resultMessage": "Declined"
+      }
+    }
+  ],
+  "expectedResult": {
+    "result": {
+      "resultStatus": "F",
+      "resultCode": "PAYMENT_REJECTED",
+      "resultMessage": "Declined"
+    },
+    "paymentId": "synthetic-payment",
+    "paymentAmount": {
+      "currency": "USD",
+      "value": "1250"
+    },
+    "paymentCreateTime": null,
+    "normalUrl": null,
+    "paymentResultInfo": null,
+    "orderCodeForm": null,
+    "extendInfo": "declined"
+  }
+}

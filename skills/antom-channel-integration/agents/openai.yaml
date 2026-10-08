@@ -1,0 +1,4 @@
+interface:
+  display_name: "Antom Channel Integration Assistant"
+  short_description: "Implement, test and deliver Antom channel adapters"
+  default_prompt: "Use $antom-channel-integration to help with my channel adapter task: explain contracts, collect missing generation requirements, implement confirmed protocol rules, or review testing and delivery readiness."
