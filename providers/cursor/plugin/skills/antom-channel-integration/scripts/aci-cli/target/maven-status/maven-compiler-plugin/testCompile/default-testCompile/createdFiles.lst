@@ -1,0 +1,10 @@
+com/antom/aci/cli/DeliveryEvidenceTest.class
+com/antom/aci/cli/SecurityFeaturesTest.class
+com/antom/aci/cli/CipherCompatibilityTest.class
+com/antom/aci/cli/AdapterPackagerTest.class
+com/antom/aci/cli/DependencyAuditTest.class
+com/antom/aci/cli/ProjectIdentityTest.class
+com/antom/aci/cli/TerminalMenuTest.class
+com/antom/aci/cli/GeneratorTest.class
+com/antom/aci/cli/LicenseResourcesTest.class
+com/antom/aci/cli/TemplateContractTest.class

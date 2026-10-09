@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/2.1.1"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/2.1.1 https://maven.apache.org/xsd/assembly-2.1.1.xsd">
+    <id>distribution</id>
+    <formats><format>zip</format></formats>
+    <includeBaseDirectory>false</includeBaseDirectory>
+    <!-- Exact files are required: a missing SDK JAR or consumer POM must fail assembly. -->
+    <files>
+        <file>
+            <source>${project.build.directory}/${project.build.finalName}.jar</source>
+            <outputDirectory>/</outputDirectory><destName>aci-cli.jar</destName>
+        </file>
+        <file>
+            <source>${project.basedir}/sdk/common-sdk-1.5.2.jar</source>
+            <outputDirectory>sdk</outputDirectory><destName>common-sdk-1.5.2.jar</destName>
+        </file>
+        <file>
+            <source>${project.basedir}/sdk/common-sdk-1.5.2.pom</source>
+            <outputDirectory>sdk</outputDirectory><destName>common-sdk-1.5.2.pom</destName>
+        </file>
+        <file>
+            <source>${project.basedir}/README.md</source>
+            <outputDirectory>/</outputDirectory><destName>README.md</destName>
+        </file>
+        <file>
+            <source>${project.basedir}/DISTRIBUTION.md</source>
+            <outputDirectory>/</outputDirectory><destName>DISTRIBUTION.md</destName>
+        </file>
+        <file>
+            <source>${project.basedir}/THIRD-PARTY-NOTICES.md</source>
+            <outputDirectory>/</outputDirectory><destName>THIRD-PARTY-NOTICES.md</destName>
+        </file>
+    </files>
+</assembly>

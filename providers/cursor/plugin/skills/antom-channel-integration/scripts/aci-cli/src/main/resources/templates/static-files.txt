@@ -1,0 +1,10 @@
+template/ChannelInvocationTemplate.java
+extension/ChannelApiExtension.java
+extension/ChannelMessageSecurity.java
+extension/ChannelNotificationExtension.java
+extension/ChannelTransport.java
+extension/message/InboundChannelMessage.java
+model/ChannelHttpResult.java
+model/ChannelOperation.java
+model/ChannelOutboundRequest.java
+support/ChannelIntegrationException.java

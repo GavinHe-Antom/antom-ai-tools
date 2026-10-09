@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "groupId": "com.example.channel",
+  "artifactId": "example-adapter",
+  "version": "1.0.0-SNAPSHOT",
+  "packageName": "com.example.channel.adapter",
+  "channelCode": "example",
+  "sdkVersion": "1.5.2",
+  "paymentType": "non-card",
+  "threeDS": "none",
+  "spi": ["pay", "refund", "inquiryRefund"],
+  "securityFeatures": {"signature": true, "encryption": false}
+}

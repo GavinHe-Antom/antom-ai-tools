@@ -1,0 +1,32 @@
+{
+  "id": "success",
+  "category": "success",
+  "confirmed": true,
+  "input": {
+    "rawBody": "{\"reference\":\"synthetic-notification-order\",\"extension\":\"synthetic-extension-value\"}",
+    "requestHeaders": {}
+  },
+  "context": {
+    "present": true,
+    "channelCode": "example",
+    "merchantId": "synthetic-notification-merchant",
+    "runtimeEnv": "synthetic-env"
+  },
+  "http": {
+    "calls": 0
+  },
+  "security": {},
+  "resultCode": [],
+  "expectedResult": {
+    "result": null,
+    "paymentRequestId": "synthetic-notification-order",
+    "paymentId": null,
+    "paymentAmount": null,
+    "urlParam": null,
+    "paymentResultInfo": null,
+    "extendInfo": "synthetic-extension-value",
+    "requestHeaders": null,
+    "rawBody": null,
+    "domain": null
+  }
+}

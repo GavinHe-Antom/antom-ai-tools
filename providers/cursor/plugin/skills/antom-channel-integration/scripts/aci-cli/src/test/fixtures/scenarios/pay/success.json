@@ -1,0 +1,97 @@
+{
+  "id": "success",
+  "category": "success",
+  "confirmed": true,
+  "description": "Independent synthetic protocol sample, not an institution implementation.",
+  "input": {
+    "paymentRequestId": "synthetic-order",
+    "merchantId": "untrusted-body-merchant",
+    "paymentAmount": {
+      "currency": "USD",
+      "value": "1250"
+    }
+  },
+  "context": {
+    "present": true,
+    "channelCode": "example",
+    "merchantId": "synthetic-merchant",
+    "runtimeEnv": null
+  },
+  "http": {
+    "calls": 1,
+    "response": {
+      "statusCode": 200,
+      "headers": {
+        "Signature": "synthetic-response-signature"
+      },
+      "body": "{\"state\":\"accepted\",\"code\":\"00\",\"message\":\"Accepted\",\"payment_id\":\"synthetic-payment\"}"
+    }
+  },
+  "expectedRequest": {
+    "method": "POST",
+    "contentType": "JSON",
+    "pathParameters": {},
+    "headers": {
+      "Content-Type": "application/json; charset=utf-8",
+      "Signature": "synthetic-signature"
+    },
+    "queryParameters": {},
+    "formParameters": {},
+    "attributes": {},
+    "body": "{\"reference\":\"synthetic-order\",\"amount\":\"1250\",\"currency\":\"USD\"}"
+  },
+  "security": {
+    "requestSign": {
+      "calls": 1,
+      "request": {
+        "merchantId": "synthetic-merchant",
+        "algorithm": "HMAC_SHA256_BASE64",
+        "content": "{\"reference\":\"synthetic-order\",\"amount\":\"1250\",\"currency\":\"USD\"}"
+      },
+      "result": "synthetic-signature"
+    },
+    "responseVerify": {
+      "calls": 1,
+      "request": {
+        "merchantId": "synthetic-merchant",
+        "algorithm": "HMAC_SHA256_BASE64",
+        "content": "{\"state\":\"accepted\",\"code\":\"00\",\"message\":\"Accepted\",\"payment_id\":\"synthetic-payment\"}",
+        "signature": "synthetic-response-signature"
+      },
+      "result": true
+    }
+  },
+  "resultCode": [
+    {
+      "calls": 1,
+      "request": {
+        "channelCode": "example",
+        "channelResultCode": "00",
+        "channelResultMsg": "Accepted",
+        "api": "pay"
+      },
+      "result": {
+        "resultStatus": "S",
+        "resultCode": "SUCCESS",
+        "resultMessage": "Accepted"
+      }
+    }
+  ],
+  "expectedResult": {
+    "result": {
+      "resultStatus": "S",
+      "resultCode": "SUCCESS",
+      "resultMessage": "Accepted"
+    },
+    "paymentId": "synthetic-payment",
+    "paymentAmount": {
+      "currency": "USD",
+      "value": "1250"
+    },
+    "paymentCreateTime": null,
+    "normalUrl": null,
+    "paymentResultInfo": null,
+    "orderCodeForm": null,
+    "extendInfo": "accepted"
+  }
+}

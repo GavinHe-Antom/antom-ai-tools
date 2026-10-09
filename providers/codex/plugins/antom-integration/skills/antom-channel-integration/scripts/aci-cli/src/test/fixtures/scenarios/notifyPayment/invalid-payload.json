@@ -1,0 +1,24 @@
+{
+  "id": "invalid-payload",
+  "category": "validation-failure",
+  "confirmed": true,
+  "input": {
+    "rawBody": "{\"reference\":\"synthetic-notification-order\"}",
+    "requestHeaders": {}
+  },
+  "context": {
+    "present": true,
+    "channelCode": "example",
+    "merchantId": "synthetic-notification-merchant",
+    "runtimeEnv": "synthetic-env"
+  },
+  "http": {
+    "calls": 0
+  },
+  "security": {},
+  "resultCode": [],
+  "expectedException": {
+    "type": "IllegalArgumentException",
+    "message": "Synthetic notification requires reference and extension"
+  }
+}

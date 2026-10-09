@@ -1,0 +1,12 @@
+#!/bin/sh
+# Run the built CLI without evaluating user-supplied arguments as shell code.
+set -eu
+ACI_BIN_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+if [ ! -f "$ACI_BIN_DIR/../target/aci-cli.jar" ]; then
+    echo "Build the CLI first: mvn -f \"$ACI_BIN_DIR/../pom.xml\" clean verify" >&2
+    exit 3
+fi
+if [ -n "${JAVA_HOME:-}" ]; then
+    exec "$JAVA_HOME/bin/java" "-Daci.cli.home=$ACI_BIN_DIR/.." -jar "$ACI_BIN_DIR/../target/aci-cli.jar" "$@"
+fi
+exec java "-Daci.cli.home=$ACI_BIN_DIR/.." -jar "$ACI_BIN_DIR/../target/aci-cli.jar" "$@"

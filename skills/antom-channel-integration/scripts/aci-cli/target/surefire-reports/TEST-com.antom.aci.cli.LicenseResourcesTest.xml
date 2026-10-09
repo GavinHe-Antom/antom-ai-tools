@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.antom.aci.cli.LicenseResourcesTest" time="0.007" tests="1" errors="0" skipped="0" failures="0">
+  <properties>
+    <property name="gopherProxySet" value="false"/>
+    <property name="awt.toolkit" value="sun.lwawt.macosx.LWCToolkit"/>
+    <property name="file.encoding.pkg" value="sun.io"/>
+    <property name="java.specification.version" value="1.8"/>
+    <property name="sun.cpu.isalist" value=""/>
+    <property name="sun.jnu.encoding" value="UTF-8"/>
+    <property name="java.class.path" value="/Users/bohuliang/IdeaProjects/study/antom-ai-tools/skills/antom-channel-integration/scripts/aci-cli/target/test-classes:/Users/bohuliang/IdeaProjects/study/antom-ai-tools/skills/antom-channel-integration/scripts/aci-cli/target/classes:/Users/bohuliang/.m2/repository/info/picocli/picocli/4.7.7/picocli-4.7.7.jar:/Users/bohuliang/.m2/repository/org/jline/jline-reader/3.26.3/jline-reader-3.26.3.jar:/Users/bohuliang/.m2/repository/org/jline/jline-terminal/3.26.3/jline-terminal-3.26.3.jar:/Users/bohuliang/.m2/repository/org/jline/jline-terminal-jni/3.26.3/jline-terminal-jni-3.26.3.jar:/Users/bohuliang/.m2/repository/org/jline/jline-native/3.26.3/jline-native-3.26.3.jar:/Users/bohuliang/.m2/repository/org/freemarker/freemarker/2.3.34/freemarker-2.3.34.jar:/Users/bohuliang/.m2/repository/com/fasterxml/jackson/core/jackson-databind/2.19.2/jackson-databind-2.19.2.jar:/Users/bohuliang/.m2/repository/com/fasterxml/jackson/core/jackson-annotations/2.19.2/jackson-annotations-2.19.2.jar:/Users/bohuliang/.m2/repository/com/fasterxml/jackson/core/jackson-core/2.19.2/jackson-core-2.19.2.jar:/Users/bohuliang/.m2/repository/org/junit/jupiter/junit-jupiter/5.10.2/junit-jupiter-5.10.2.jar:/Users/bohuliang/.m2/repository/org/junit/jupiter/junit-jupiter-api/5.10.2/junit-jupiter-api-5.10.2.jar:/Users/bohuliang/.m2/repository/org/opentest4j/opentest4j/1.3.0/opentest4j-1.3.0.jar:/Users/bohuliang/.m2/repository/org/junit/platform/junit-platform-commons/1.10.2/junit-platform-commons-1.10.2.jar:/Users/bohuliang/.m2/repository/org/apiguardian/apiguardian-api/1.1.2/apiguardian-api-1.1.2.jar:/Users/bohuliang/.m2/repository/org/junit/jupiter/junit-jupiter-params/5.10.2/junit-jupiter-params-5.10.2.jar:/Users/bohuliang/.m2/repository/org/junit/jupiter/junit-jupiter-engine/5.10.2/junit-jupiter-engine-5.10.2.jar:/Users/bohuliang/.m2/repository/org/junit/platform/junit-platform-engine/1.10.2/junit-platform-engine-1.10.2.jar:"/>
+    <property name="java.vm.vendor" value="Azul Systems, Inc."/>
+    <property name="sun.arch.data.model" value="64"/>
+    <property name="java.vendor.url" value="http://www.azul.com/"/>
+    <property name="user.timezone" value="Asia/Shanghai"/>
+    <property name="java.vm.specification.version" value="1.8"/>
+    <property name="os.name" value="Mac OS X"/>
+    <property name="user.country" value="CN"/>
+    <property name="sun.java.launcher" value="SUN_STANDARD"/>
+    <property name="sun.boot.library.path" value="/Library/Java/JavaVirtualMachines/zulu-8.jdk/Contents/Home/jre/lib"/>
+    <property name="sun.java.command" value="/Users/bohuliang/IdeaProjects/study/antom-ai-tools/skills/antom-channel-integration/scripts/aci-cli/target/surefire/surefirebooter-20261008194859078_3.jar /Users/bohuliang/IdeaProjects/study/antom-ai-tools/skills/antom-channel-integration/scripts/aci-cli/target/surefire 2026-10-08T19-48-58_909-jvmRun1 surefire-20261008194859078_1tmp surefire_0-20261008194859078_2tmp"/>
+    <property name="surefire.test.class.path" value="/Users/bohuliang/IdeaProjects/study/antom-ai-tools/skills/antom-channel-integration/scripts/aci-cli/target/test-classes:/Users/bohuliang/IdeaProjects/study/antom-ai-tools/skills/antom-channel-integration/scripts/aci-cli/target/classes:/Users/bohuliang/.m2/repository/info/picocli/picocli/4.7.7/picocli-4.7.7.jar:/Users/bohuliang/.m2/repository/org/jline/jline-reader/3.26.3/jline-reader-3.26.3.jar:/Users/bohuliang/.m2/repository/org/jline/jline-terminal/3.26.3/jline-terminal-3.26.3.jar:/Users/bohuliang/.m2/repository/org/jline/jline-terminal-jni/3.26.3/jline-terminal-jni-3.26.3.jar:/Users/bohuliang/.m2/repository/org/jline/jline-native/3.26.3/jline-native-3.26.3.jar:/Users/bohuliang/.m2/repository/org/freemarker/freemarker/2.3.34/freemarker-2.3.34.jar:/Users/bohuliang/.m2/repository/com/fasterxml/jackson/core/jackson-databind/2.19.2/jackson-databind-2.19.2.jar:/Users/bohuliang/.m2/repository/com/fasterxml/jackson/core/jackson-annotations/2.19.2/jackson-annotations-2.19.2.jar:/Users/bohuliang/.m2/repository/com/fasterxml/jackson/core/jackson-core/2.19.2/jackson-core-2.19.2.jar:/Users/bohuliang/.m2/repository/org/junit/jupiter/junit-jupiter/5.10.2/junit-jupiter-5.10.2.jar:/Users/bohuliang/.m2/repository/org/junit/jupiter/junit-jupiter-api/5.10.2/junit-jupiter-api-5.10.2.jar:/Users/bohuliang/.m2/repository/org/opentest4j/opentest4j/1.3.0/opentest4j-1.3.0.jar:/Users/bohuliang/.m2/repository/org/junit/platform/junit-platform-commons/1.10.2/junit-platform-commons-1.10.2.jar:/Users/bohuliang/.m2/repository/org/apiguardian/apiguardian-api/1.1.2/apiguardian-api-1.1.2.jar:/Users/bohuliang/.m2/repository/org/junit/jupiter/junit-jupiter-params/5.10.2/junit-jupiter-params-5.10.2.jar:/Users/bohuliang/.m2/repository/org/junit/jupiter/junit-jupiter-engine/5.10.2/junit-jupiter-engine-5.10.2.jar:/Users/bohuliang/.m2/repository/org/junit/platform/junit-platform-engine/1.10.2/junit-platform-engine-1.10.2.jar:"/>
+    <property name="sun.cpu.endian" value="little"/>
+    <property name="user.home" value="/Users/bohuliang"/>
+    <property name="user.language" value="zh"/>
+    <property name="java.specification.vendor" value="Oracle Corporation"/>
+    <property name="java.home" value="/Library/Java/JavaVirtualMachines/zulu-8.jdk/Contents/Home/jre"/>
+    <property name="basedir" value="/Users/bohuliang/IdeaProjects/study/antom-ai-tools/skills/antom-channel-integration/scripts/aci-cli"/>
+    <property name="file.separator" value="/"/>
+    <property name="line.separator" value="&#10;"/>
+    <property name="jdk.vendor.version" value="Zulu 8.82.0.21-CA-macos-aarch64"/>
+    <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
+    <property name="java.specification.name" value="Java Platform API Specification"/>
+    <property name="java.awt.graphicsenv" value="sun.awt.CGraphicsEnvironment"/>
+    <property name="surefire.real.class.path" value="/Users/bohuliang/IdeaProjects/study/antom-ai-tools/skills/antom-channel-integration/scripts/aci-cli/target/surefire/surefirebooter-20261008194859078_3.jar"/>
+    <property name="sun.boot.class.path" value="/Library/Java/JavaVirtualMachines/zulu-8.jdk/Contents/Home/jre/lib/resources.jar:/Library/Java/JavaVirtualMachines/zulu-8.jdk/Contents/Home/jre/lib/rt.jar:/Library/Java/JavaVirtualMachines/zulu-8.jdk/Contents/Home/jre/lib/sunrsasign.jar:/Library/Java/JavaVirtualMachines/zulu-8.jdk/Contents/Home/jre/lib/jsse.jar:/Library/Java/JavaVirtualMachines/zulu-8.jdk/Contents/Home/jre/lib/jce.jar:/Library/Java/JavaVirtualMachines/zulu-8.jdk/Contents/Home/jre/lib/charsets.jar:/Library/Java/JavaVirtualMachines/zulu-8.jdk/Contents/Home/jre/lib/jfr.jar:/Library/Java/JavaVirtualMachines/zulu-8.jdk/Contents/Home/jre/lib/cat.jar:/Library/Java/JavaVirtualMachines/zulu-8.jdk/Contents/Home/jre/classes"/>
+    <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
+    <property name="java.runtime.version" value="1.8.0_432-b06"/>
+    <property name="user.name" value="bohuliang"/>
+    <property name="path.separator" value=":"/>
+    <property name="os.version" value="26.2"/>
+    <property name="java.endorsed.dirs" value="/Library/Java/JavaVirtualMachines/zulu-8.jdk/Contents/Home/jre/lib/endorsed"/>
+    <property name="java.runtime.name" value="OpenJDK Runtime Environment"/>
+    <property name="file.encoding" value="UTF-8"/>
+    <property name="java.vm.name" value="OpenJDK 64-Bit Server VM"/>
+    <property name="localRepository" value="/Users/bohuliang/.m2/repository"/>
+    <property name="java.vendor.url.bug" value="http://www.azul.com/support/"/>
+    <property name="java.io.tmpdir" value="/var/folders/wz/rbzhrs4s65gd08lckywbzyjc0000gn/T/"/>
+    <property name="java.version" value="1.8.0_432"/>
+    <property name="user.dir" value="/Users/bohuliang/IdeaProjects/study/antom-ai-tools/skills/antom-channel-integration/scripts/aci-cli"/>
+    <property name="os.arch" value="aarch64"/>
+    <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
+    <property name="java.awt.printerjob" value="sun.lwawt.macosx.CPrinterJob"/>
+    <property name="sun.os.patch.level" value="unknown"/>
+    <property name="java.library.path" value="/Users/bohuliang/Library/Java/Extensions:/Library/Java/Extensions:/Network/Library/Java/Extensions:/System/Library/Java/Extensions:/usr/lib/java:."/>
+    <property name="java.vm.info" value="mixed mode"/>
+    <property name="java.vendor" value="Azul Systems, Inc."/>
+    <property name="java.vm.version" value="25.432-b06"/>
+    <property name="java.specification.maintenance.version" value="6"/>
+    <property name="java.ext.dirs" value="/Users/bohuliang/Library/Java/Extensions:/Library/Java/JavaVirtualMachines/zulu-8.jdk/Contents/Home/jre/lib/ext:/Library/Java/Extensions:/Network/Library/Java/Extensions:/System/Library/Java/Extensions:/usr/lib/java"/>
+    <property name="sun.io.unicode.encoding" value="UnicodeBig"/>
+    <property name="java.class.version" value="52.0"/>
+  </properties>
+  <testcase name="includesJlineCopyrightConditionsAndDisclaimer" classname="com.antom.aci.cli.LicenseResourcesTest" time="0.007"/>
+</testsuite>
