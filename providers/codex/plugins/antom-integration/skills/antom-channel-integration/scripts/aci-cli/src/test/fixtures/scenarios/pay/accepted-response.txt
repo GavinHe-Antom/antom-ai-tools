@@ -1,0 +1,1 @@
+{"state":"accepted","code":"00","message":"Accepted","payment_id":"synthetic-payment"}
