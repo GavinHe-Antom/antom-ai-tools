@@ -92,22 +92,11 @@ Generated code must:
 
 > The logging code is for **development & debugging only** — remove or reduce once integration is stable.
 
-## Validation and Post-code Guidance
+## Integration Testing and Go-live Preparation
 
-Read [Integration Checklist](https://cdn.marmot-cloud.com/page/antom-integration-doc/references/checklist.md) before finalizing code or launch-readiness guidance.
+After writing integration code, read [Integration Testing and Go-live Preparation](https://cdn.marmot-cloud.com/page/antom-integration-doc/integration-guides/integration-testing-and-go-live-preparation.md) to guide the merchant through the applicable next steps: configure credentials, test local notification handling, run sandbox payments, and check what remains before going live. Also read it before giving go-live advice.
 
-When guiding credentials and config, include credential locations:
-- API domain, Client ID, and Antom public key can be found in [Quick Start](https://dashboard.antom.com/global-payments/developers/quickStart).
-- The merchant private key can be generated or managed in [iKeys](https://dashboard.antom.com/global-payments/developers/iKeys); keep it server-side and never log, expose, or commit it.
-
-After code is written, do not stop at "code is done". Guide the user through:
-- credentials and config: [Onboarding Guide](https://cdn.marmot-cloud.com/page/antom-integration-doc/integration-guides/onboarding.md)
-- sandbox testing: [Sandbox Guide](https://cdn.marmot-cloud.com/page/antom-integration-doc/integration-guides/sandbox-guide.md)
-- self-check and go-live readiness: [Self-Check List](https://cdn.marmot-cloud.com/page/antom-integration-doc/integration-guides/self-check.md)
-- Billing code completion: [Billing Self-check](https://cdn.marmot-cloud.com/page/antom-integration-doc/integration-guides/billing-self-check.md)
-- error diagnosis: use `Troubleshooting`
-
-If the user asks about credentials, registration, sandbox testing, checklist, self-check, or go-live readiness at any point, read the matching companion doc and answer inline.
+If the user asks about registration, credentials, local notification debugging, sandbox testing, checklist, self-check, or go-live preparation at any point, use the guide to find and read the document for that question, then answer it.
 
 # Troubleshooting
 
