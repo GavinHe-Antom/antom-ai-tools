@@ -61,7 +61,7 @@ Both preview and generation check direct sibling adapter manifests for conflicti
 
 Interactive mode requires a real ANSI-capable terminal with stdin and stderr attached. Use `--config` for pipes, CI or IDE consoles without terminal support; there is no numeric-input fallback. Menus write only to stderr, so `--json` stdout remains a single result object. Cancellation returns 130, leaves no partial project and restores terminal settings.
 
-Terminal interaction uses [JLine](https://jline.org/docs/terminal/), pinned to Java-8-compatible 3.26.3. It affects only the CLI, not the adapter or platform runtime.
+Terminal interaction uses [JLine](https://jline.org/docs/terminal/), pinned to Java-8-compatible 3.30.15. It affects only the CLI, not the adapter or platform runtime.
 
 Answer the two global questions once: signature handling yes/no, then encryption handling yes/no. The answers populate `securityFeatures.signature` and `securityFeatures.encryption`. Signature enables request signing and response/notification verification; encryption enables request encryption and response/notification decryption. Disabled features use no computation. Enabled features generate typed platform-call examples whose protocol hooks throw until implemented, not a working institution algorithm or canonical input.
 

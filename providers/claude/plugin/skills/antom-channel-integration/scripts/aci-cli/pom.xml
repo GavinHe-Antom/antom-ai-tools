@@ -12,10 +12,10 @@
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <picocli.version>4.7.7</picocli.version>
-        <freemarker.version>2.3.34</freemarker.version>
-        <jackson.version>2.19.2</jackson.version>
+        <freemarker.version>2.3.35</freemarker.version>
+        <jackson.version>2.21.7</jackson.version>
         <junit.version>5.10.2</junit.version>
-        <jline.version>3.26.3</jline.version>
+        <jline.version>3.30.15</jline.version>
     </properties>
     <dependencies>
         <dependency><groupId>info.picocli</groupId><artifactId>picocli</artifactId><version>${picocli.version}</version></dependency>
